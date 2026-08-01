@@ -1,3 +1,4 @@
+from moves import Piece
 class Board:
     def __init__(self, clock=False):
         self.board = [["r", "n", "b", "q", "k", "b", "n", "r"],
@@ -29,8 +30,7 @@ class Board:
                       6:"g",
                       7:"h",
                       }
-        self.white_pieces = {}
-        self.black_pieces = {}
+        self.pieces = self.board
         self.black_in_check = False
         self.white_in_check = False
         self.clock = clock
@@ -43,10 +43,12 @@ class Board:
                     color = "black" if piece_type.isLower() else "white"
                     piece = Piece(piece_type, (x, y))
                     if color == "black":
-                        self.black_pieces[f"{x}-{y}"] = piece
+                        self.black_pieces[piece.id] = piece
                         
                     else:
-                        self.white_pieces[f"{x}-{y}"] = piece
+                        self.white_pieces[piece.id] = piece
+
+                    self.pieces[x][y] = piece
 
         return
 
@@ -62,10 +64,10 @@ class Board:
         """
         Change the state base on the move
         """
-        piece = self.pieces[old_pos[0], old_pos[1]]
-        if piece.legal(new_pos):
+        piece_type = self.board[old_pos[0], old_pos[1]]
+        if piece.legal_move(new_pos):
             self.board[old_pos[0]][old_pos[1]] = "."
-            self.board[new_pos[0]][new_pos[1]] = 
+            self.board[new_pos[0]][new_pos[1]] = piece_type
         else:
             """
             We can't raise an error

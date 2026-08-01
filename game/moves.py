@@ -2,6 +2,9 @@
 Come back to this.
 
 Not yet done
+
+If any legal move threatens the king directly, call, check then call legal move for the king,
+also create a path for the pieces so that when the king is in check you can find out which moves can block the path
 """
 
 class Piece:
@@ -10,6 +13,7 @@ class Piece:
         self.position = position #tuple
         self.promotion_elgible = False
         self.active = True
+        self.piece_id
 
     def move(self):
         return
