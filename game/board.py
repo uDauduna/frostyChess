@@ -59,12 +59,9 @@ class Board:
         """
         return
 
-    def change_state(self, old_pos, new_pos):
-
-        """
-        Change the state base on the move
-        """
+    def move_piece(self, old_pos, new_pos):
         piece_type = self.board[old_pos[0], old_pos[1]]
+        piece = self.pieces[old_pos[0], old_pos[1]]
         if piece.legal_move(new_pos):
             self.board[old_pos[0]][old_pos[1]] = "."
             self.board[new_pos[0]][new_pos[1]] = piece_type
@@ -80,6 +77,7 @@ class Board:
         if self.board[pos[0]][pos[1]] == ".":
             return True
         return False
+
 
     def timer(self):
         """

@@ -14,9 +14,6 @@ class Piece:
         self.promotion_elgible = False
         self.active = True
 
-    def move(self):
-        return
-
     def in_bounds(self,pos):
         x, y = pos
         if x >= 0 and x < 8:
@@ -77,6 +74,7 @@ class Piece:
             else:
                 if legal_obstacle((x, y)):
                     legal_positions.append((x, y))
+                    break
             if (x, y) == new_pos:
                 legal = True
 
@@ -88,6 +86,7 @@ class Piece:
             else:
                 if legal_obstacle((x, y)):
                     legal_positions.append((x, y))
+                    break
 
             if (x, y) == new_pos:
                 legal = True
@@ -99,6 +98,7 @@ class Piece:
             else:
                 if legal_obstacle((x, y)):
                     legal_positions.append((x, y))
+                    break
             if (x, y) == new_pos:
                 legal = True
         while (x < 8 and y >= 0):
@@ -109,6 +109,7 @@ class Piece:
             else:
                 if legal_obstacle((x, y)):
                     legal_positions.append((x, y))
+                    break
             if (x, y) == new_pos:
                 legal = True
             self.move(new_pos)
@@ -126,6 +127,7 @@ class Piece:
             else:
                 if legal_obstacle((x, y)):
                     legal_positions.append((x, y))
+                    break
             if (x, y) == new_pos:
                 legal = True
 
@@ -136,6 +138,7 @@ class Piece:
             else:
                 if legal_obstacle((x, y)):
                     legal_positions.append((x, y))
+                    break
 
             if (x, y) == new_pos:
                 legal = True
@@ -146,6 +149,7 @@ class Piece:
             else:
                 if legal_obstacle((x, y)):
                     legal_positions.append((x, y))
+                    break
             if (x, y) == new_pos:
                 legal = True
         while y >= 0:
@@ -156,6 +160,7 @@ class Piece:
             else:
                 if legal_obstacle((x, y)):
                     legal_positions.append((x, y))
+                    break
             if (x, y) == new_pos:
                 legal = True
 
