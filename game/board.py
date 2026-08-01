@@ -1,9 +1,14 @@
 from .pieces.pawn import Pawn
+from .pieces.knight import Knight
+from .pieces.bishop import Bishop
+from .pieces.rook import Rook
+from .pieces.king import King
+from .pieces.queen import Queen
 
 
 class Board:
     def __init__(self, clock=False):
-        self.board = [["r", "n", "b", "q", "k", "b", "n", "r"],
+        self.board_state = [["r", "n", "b", "q", "k", "b", "n", "r"],
                       ["p", "p", "p", "p", "p", "p", "p", "p"],
                       [".", ".", ".", ".", ".", ".", ".", "."],
                       [".", ".", ".", ".", ".", ".", ".", "."],
@@ -32,26 +37,38 @@ class Board:
                       6:"g",
                       7:"h",
                       }
-        self.pieces = self.board
+        self.pieces = [[".", ".", ".", ".", ".", ".", ".", "."],
+                      [".", ".", ".", ".", ".", ".", ".", "."],
+                      [".", ".", ".", ".", ".", ".", ".", "."],
+                      [".", ".", ".", ".", ".", ".", ".", "."],
+                      [".", ".", ".", ".", ".", ".", ".", "."],
+                      [".", ".", ".", ".", ".", ".", ".", "."],
+                      [".", ".", ".", ".", ".", ".", ".", "."],
+                      [".", ".", ".", ".", ".", ".", ".", "."],
+                      ]
+        self.initialize_Pieces()
         self.black_in_check = False
         self.white_in_check = False
         self.clock = clock
 
     def initialize_Pieces(self):
-        for x in range(len(self.board)):
-            for y in range(len(self.board)):
-                piece_type = self.board[x][y]
+        for x in range(len(self.board_state)):
+            for y in range(len(self.board_state)):
+                piece_type = self.board_state[x][y]
                 if piece_type != ".":
-                    color = "black" if piece_type.isLower() else "white"
-                    piece = Piece(piece_type, (x, y))
-                    if color == "black":
-                        self.black_pieces[piece.id] = piece
-                        
-                    else:
-                        self.white_pieces[piece.id] = piece
-
-                    self.pieces[x][y] = piece
-
+                    color = "black" if piece_type.islower() else "white"
+                    if piece_type.lower() == "p":
+                        self.pieces[x][y] = Pawn((x, y), color)
+                    elif piece_type.lower() == "r":
+                        self.pieces[x][y] = Rook((x, y), color)
+                    elif piece_type.lower() == "n":
+                        self.pieces[x][y] = Knight((x, y), color)
+                    elif piece_type.lower() == "b":
+                        self.pieces[x][y] = Bishop((x, y), color)
+                    elif piece_type.lower() == "k":
+                        self.pieces[x][y] = King((x, y), color)
+                    elif piece_type.lower() == "q":
+                        self.pieces[x][y] = Queen((x, y), color)
         return
 
 
@@ -61,22 +78,8 @@ class Board:
         """
         return
 
-    def move_piece(self, old_pos, new_pos):
-        piece_type = self.board[old_pos[0], old_pos[1]]
-        piece = self.pieces[old_pos[0], old_pos[1]]
-        if piece.legal_move(new_pos):
-            self.board[old_pos[0]][old_pos[1]] = "."
-            self.board[new_pos[0]][new_pos[1]] = piece_type
-        else:
-            """
-            We can't raise an error
-            """
-            print("Illegal Move")
-
-        return
-
     def square_is_empty(self, pos):
-        if self.board[pos[0]][pos[1]] == ".":
+        if self.board_state[pos[0]][pos[1]] == ".":
             return True
         return False
 

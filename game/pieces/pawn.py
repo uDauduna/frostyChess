@@ -3,7 +3,7 @@ class Pawn:
         self.color = color
         self.x, self.y = pos
         self.promotion = False
-        self.eligible_moves = []
+        self.eligible = []
         self.direction = 1 if self.color == "black" else -1
 
     def move(self, new_pos, board):
@@ -12,17 +12,32 @@ class Pawn:
             self.x, self.y = new_pos
         return
 
-    def adjecent_capture_possible(self, board):
-        if board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)].color != self.color or board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)].color != self.color:
-            return True
+    def adjacent_capture_possible(self, board):
+        """
+        Fix this function to check individual squares
+        """
+        
+        if board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)] != "." or board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)]!= ".":
+            if board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)].color != self.color or board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)].color != self.color:
+                return True
         return False
     
     def eligible_moves(self, board):
-        self.eligible_moves = []
+        self.eligible = []
         if (self.x == 1 and self.color == "black") or (self.x == 7 and self.color == "white"):
-            self.eligible_moves.append((self.x + (self.direction*1), self.y))
-            self.eligible_moves.append((self.x + (2 * self.direction), self.y))
-        if self.adjecent_capture_possible(board):
-            self.eligible_moves.append(self.x + (1 * self.direction), self.y + (1*self.direction))
-            self.eligible_moves.append(self.x + (1 * self.direction), self.y + (1*self.direction))
-        return self.eligible_moves
+            self.eligible.append((self.x + (self.direction*1), self.y))
+            self.eligible.append((self.x + (2 * self.direction), self.y))
+        if self.adjacent_capture_possible(board):
+            self.eligible.append(self.x + (1 * self.direction), self.y + (1*self.direction))
+            self.eligible.append(self.x + (1 * self.direction), self.y + (1*self.direction))
+        return self.eligible
+
+    def is_move_legal(self, pos, board):
+        self.eligible = self.eligible_moves(board)
+        if pos in self.eligible:
+            return True
+        return False
+
+    def update_position(self, new_pos):
+        self.x, self.y = new_pos
+        return
