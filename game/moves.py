@@ -13,16 +13,9 @@ class Piece:
         self.position = position #tuple
         self.promotion_elgible = False
         self.active = True
-        self.piece_id
 
     def move(self):
         return
-
-    def legal(self, move):
-        if move == "castle":
-            if self.castle_legal:
-                #castle
-                castle = "castle"
 
     def in_bounds(self,pos):
         x, y = pos
@@ -68,9 +61,8 @@ class Piece:
             legal_moves.append((x, y))
             if new_pos == (x + 2, y + 1):
                 legal = True
-        if legal:
-            if not_in_check:
-                play_move(new_pos)
+        self.move(new_pos)
+        return legal_moves
                 
 
     def diagonal_move(self,old_pos, new_pos):
@@ -119,11 +111,7 @@ class Piece:
                     legal_positions.append((x, y))
             if (x, y) == new_pos:
                 legal = True
-
-        if legal:
-            if not in_check:
-                play_move(new_pos)
-
+            self.move(new_pos)
         return legal_positions
 
     
