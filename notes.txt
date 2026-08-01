@@ -1,0 +1,68 @@
+To - do
+=======
+
+
+1. create and virtual environment
+Windows -> Create: python -m venv venv | Activate: venv\Scripts\activate.bat/ Pwowershell -> venv\Scripts\Activate.ps1 
+MacOS -> Create: python3 -m venv venv | Activate: source venv/bin/activate
+
+pip install -r requirements.txt
+pip freeze > requirements.txt
+
+2. Order
+
+a. Draw the board.
+b. Load piece images.
+c. Display pieces
+d. Select pieces.
+e. Move pieces
+f. Implement legal movement
+g. Alternate turns
+h. Capture pieces
+i. Detect check
+j. Detect Checkmate
+k. Add special moves
+l. Polish the UI
+m. Add AI
+
+3. Structure
+
+main.py
+requirements
+README
+
+assets
+
+game
+_board
+_game
+_move
+_constants
+_state
+
+pieces
+_piece
+_pawn
+_rook
+_knight
+_bishop
+_queen
+_king
+
+ui
+_renderer
+_input
+_animations
+
+
+4. To read
+
+Event loops 
+State machines
+Model-View-Controller(MVC)
+Finite State Machines
+Searching
+Minimax
+Alpha-Beta pruning
+FEN notation
+PGN notation 
