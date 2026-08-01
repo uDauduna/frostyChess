@@ -1,4 +1,6 @@
-from moves import Piece
+from .pieces.pawn import Pawn
+
+
 class Board:
     def __init__(self, clock=False):
         self.board = [["r", "n", "b", "q", "k", "b", "n", "r"],
@@ -84,8 +86,3 @@ class Board:
         To be implemented
         """
         return
-    
-
-board = Board()
-
-print(board.board)
