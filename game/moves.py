@@ -15,102 +15,61 @@ class Piece:
         self.active = True
 
     def in_bounds(self,pos):
-        x, y = pos
-        if x >= 0 and x < 8:
-            if y < 8 and y < 8:
+        row, col = pos
+        if row >= 0 and row < 8:
+            if col < 8 and col < 8:
                 return True
         return False
 
-    def knight_move(self,old_pos, new_pos):
-        legal = False
-        legal_moves = []
-
-        x, y = old_pos
-        if self.in_bounds(x - 1, y - 2):
-            legal_moves.append((x, y))
-            if new_pos == (x - 1, y - 2):
-                legal = True
-        if self.in_bounds(x + 1, y - 2):
-            legal_moves.append((x, y))
-            if new_pos == (x + 1, y - 2):
-                legal = True
-        if self.in_bounds(x - 2, y - 1):
-            legal_moves.append((x, y))
-            if new_pos == (x - 2, y - 1):
-                legal = True
-        if self.in_bounds(x + 2, y - 1):
-            legal_moves.append((x, y))
-            if new_pos == (x + 2, y - 1):
-                legal = True
-        if self.in_bounds(x - 1, y + 2):
-            legal_moves.append((x, y))
-            if new_pos == (x - 1, y + 2):
-                legal = True
-        if self.in_bounds(x - 2, y + 1):
-            legal_moves.append((x, y))
-            if new_pos == (x - 2, y + 1):
-                legal = True
-        if self.in_bounds(x + 1, y + 2):
-            legal_moves.append((x, y))
-            if new_pos == (x + 1, y + 2):
-                legal = True
-        if self.in_bounds(x + 2, y + 1):
-            legal_moves.append((x, y))
-            if new_pos == (x + 2, y + 1):
-                legal = True
-        self.move(new_pos)
-        return legal_moves
-                
-
     def diagonal_move(self,old_pos, new_pos):
         legal_positions = []
-        x, y = old_pos
+        row, col = old_pos
         legal = False
-        while (x < 8 and y < 8):
-            x += 1
-            y += 1 
-            if empty_square((x, y)):
-                legal_positions.append((x, y))
+        while (row < 8 and col < 8):
+            row += 1
+            col += 1 
+            if empty_square((row, col)):
+                legal_positions.append((row, col))
             else:
-                if legal_obstacle((x, y)):
-                    legal_positions.append((x, y))
+                if legal_obstacle((row, col)):
+                    legal_positions.append((row, col))
                     break
-            if (x, y) == new_pos:
+            if (row, col) == new_pos:
                 legal = True
 
-        while (x >= 0 and y >= 0):
-            x -= 1
-            y -= 1 
-            if empty_square((x, y)):
-                legal_positions.append((x, y))
+        while (row >= 0 and col >= 0):
+            row -= 1
+            col -= 1 
+            if empty_square((row, col)):
+                legal_positions.append((row, col))
             else:
-                if legal_obstacle((x, y)):
-                    legal_positions.append((x, y))
+                if legal_obstacle((row, col)):
+                    legal_positions.append((row, col))
                     break
 
-            if (x, y) == new_pos:
+            if (row, col) == new_pos:
                 legal = True
-        while (x >= 0 and y < 8):
-            x -= 1
-            y += 1 
-            if empty_square((x, y)):
-                legal_positions.append((x, y))
+        while (row >= 0 and col < 8):
+            row -= 1
+            col += 1 
+            if empty_square((row, col)):
+                legal_positions.append((row, col))
             else:
-                if legal_obstacle((x, y)):
-                    legal_positions.append((x, y))
+                if legal_obstacle((row, col)):
+                    legal_positions.append((row, col))
                     break
-            if (x, y) == new_pos:
+            if (row, col) == new_pos:
                 legal = True
-        while (x < 8 and y >= 0):
-            x += 1
-            y -= 1 
-            if empty_square((x, y)):
-                legal_positions.append((x, y))
+        while (row < 8 and col >= 0):
+            row += 1
+            col -= 1 
+            if empty_square((row, col)):
+                legal_positions.append((row, col))
             else:
-                if legal_obstacle((x, y)):
-                    legal_positions.append((x, y))
+                if legal_obstacle((row, col)):
+                    legal_positions.append((row, col))
                     break
-            if (x, y) == new_pos:
+            if (row, col) == new_pos:
                 legal = True
             self.move(new_pos)
         return legal_positions
@@ -118,50 +77,50 @@ class Piece:
     
     def horizontal_vertical_move(self, old_pos, new_pos):
         legal_positions = []
-        x, y = old_pos
+        row, col = old_pos
         legal = False
-        while x < 8 :
-            x += 1
-            if empty_square((x, y)):
-                legal_positions.append((x, y))
+        while row < 8 :
+            row += 1
+            if empty_square((row, col)):
+                legal_positions.append((row, col))
             else:
-                if legal_obstacle((x, y)):
-                    legal_positions.append((x, y))
+                if legal_obstacle((row, col)):
+                    legal_positions.append((row, col))
                     break
-            if (x, y) == new_pos:
+            if (row, col) == new_pos:
                 legal = True
 
-        while x >= 0:
-            x -= 1
-            if empty_square((x, y)):
-                legal_positions.append((x, y))
+        while row >= 0:
+            row -= 1
+            if empty_square((row, col)):
+                legal_positions.append((row, col))
             else:
-                if legal_obstacle((x, y)):
-                    legal_positions.append((x, y))
+                if legal_obstacle((row, col)):
+                    legal_positions.append((row, col))
                     break
 
-            if (x, y) == new_pos:
+            if (row, col) == new_pos:
                 legal = True
-        while y < 8:
-            y += 1 
-            if empty_square((x, y)):
-                legal_positions.append((x, y))
+        while col < 8:
+            col += 1 
+            if empty_square((row, col)):
+                legal_positions.append((row, col))
             else:
-                if legal_obstacle((x, y)):
-                    legal_positions.append((x, y))
+                if legal_obstacle((row, col)):
+                    legal_positions.append((row, col))
                     break
-            if (x, y) == new_pos:
+            if (row, col) == new_pos:
                 legal = True
-        while y >= 0:
-            x += 1
-            y -= 1 
-            if empty_square((x, y)):
-                legal_positions.append((x, y))
+        while col >= 0:
+            row += 1
+            col -= 1 
+            if empty_square((row, col)):
+                legal_positions.append((row, col))
             else:
-                if legal_obstacle((x, y)):
-                    legal_positions.append((x, y))
+                if legal_obstacle((row, col)):
+                    legal_positions.append((row, col))
                     break
-            if (x, y) == new_pos:
+            if (row, col) == new_pos:
                 legal = True
 
         if legal:

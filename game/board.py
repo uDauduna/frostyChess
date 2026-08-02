@@ -52,23 +52,23 @@ class Board:
         self.clock = clock
 
     def initialize_Pieces(self):
-        for x in range(len(self.board_state)):
-            for y in range(len(self.board_state)):
-                piece_type = self.board_state[x][y]
+        for row in range(len(self.board_state)):
+            for col in range(len(self.board_state)):
+                piece_type = self.board_state[row][col]
                 if piece_type != ".":
                     color = "black" if piece_type.islower() else "white"
                     if piece_type.lower() == "p":
-                        self.pieces[x][y] = Pawn((x, y), color)
+                        self.pieces[row][col] = Pawn((row, col), color)
                     elif piece_type.lower() == "r":
-                        self.pieces[x][y] = Rook((x, y), color)
+                        self.pieces[row][col] = Rook((row, col), color)
                     elif piece_type.lower() == "n":
-                        self.pieces[x][y] = Knight((x, y), color)
+                        self.pieces[row][col] = Knight((row, col), color)
                     elif piece_type.lower() == "b":
-                        self.pieces[x][y] = Bishop((x, y), color)
+                        self.pieces[row][col] = Bishop((row, col), color)
                     elif piece_type.lower() == "k":
-                        self.pieces[x][y] = King((x, y), color)
+                        self.pieces[row][col] = King((row, col), color)
                     elif piece_type.lower() == "q":
-                        self.pieces[x][y] = Queen((x, y), color)
+                        self.pieces[row][col] = Queen((row, col), color)
         return
 
 
