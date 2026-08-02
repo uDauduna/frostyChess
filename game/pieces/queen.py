@@ -6,3 +6,6 @@ class Queen:
     def move(self):
         return
 
+    def update_position(self, new_pos):
+        self.x, self.y = new_pos
+        return

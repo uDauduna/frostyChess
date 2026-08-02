@@ -9,8 +9,11 @@ class Game:
         piece = self.board.pieces[old_pos[0]][old_pos[1]]
         if piece.is_move_legal(new_pos, self.board):
             self.board.board_state[old_pos[0]][old_pos[1]] = "."
-            self.board.board_state[new_pos[0]][new_pos[1]] = piece_type
             self.board.pieces[old_pos[0]][old_pos[1]] = "."
+            print(piece_type, old_pos, new_pos)
+            if piece_type.lower() == "p" and (new_pos[0] == 0  or new_pos[0] == 7):
+                piece_type, piece = self.board.promote_piece(new_pos)
+            self.board.board_state[new_pos[0]][new_pos[1]] = piece_type
             self.board.pieces[new_pos[0]][new_pos[1]] = piece
             piece.update_position(new_pos)
         else:
@@ -25,7 +28,7 @@ class Game:
         for row in self.board.board_state:
             print(row)
         print("===============================================")
-        self.move_piece((1,1), (3,1))
+        self.move_piece((6,1), (7,1))
         for row in self.board.board_state:
             print(row)
         return
