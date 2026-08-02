@@ -6,30 +6,29 @@ class Pawn:
         self.eligible = []
         self.direction = 1 if self.color == "black" else -1
 
-    def move(self, new_pos, board):
-        if self.new_pos in self.eligible_moves(board):
-            board.change_state((self.x, self.y), new_pos)
-            self.x, self.y = new_pos
-        return
 
     def adjacent_capture_possible(self, board):
         """
         Fix this function to check individual squares
         """
-        
-        if board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)] != "." or board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)]!= ".":
-            if board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)].color != self.color or board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)].color != self.color:
-                return True
-        return False
+        eligible = []
+        if board.pieces[self.x + (1 * self.direction)][self.y - (1*self.direction)] != ".":
+            if board.pieces[self.x + (1 * self.direction)][self.y - (1*self.direction)].color != self.color:
+                eligible.append((self.x + (1 * self.direction), self.y - (1*self.direction)))
+                
+        if board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)]!= ".":
+            if board.pieces[self.x + (1 * self.direction)][self.y + (1*self.direction)].color != self.color:
+                eligible.append((self.x + (1 * self.direction), self.y + (1*self.direction)))
+        return eligible
     
     def eligible_moves(self, board):
         self.eligible = []
-        if (self.x == 1 and self.color == "black") or (self.x == 7 and self.color == "white"):
+        if board.square_is_empty((self.x + (self.direction*1),self.y)):
             self.eligible.append((self.x + (self.direction*1), self.y))
-            self.eligible.append((self.x + (2 * self.direction), self.y))
-        if self.adjacent_capture_possible(board):
-            self.eligible.append(self.x + (1 * self.direction), self.y + (1*self.direction))
-            self.eligible.append(self.x + (1 * self.direction), self.y + (1*self.direction))
+        if (self.x == 1 and self.color == "black") or (self.x == 7 and self.color == "white"): # add forward moves, adjust for foreign objects later
+            if board.square_is_empty((self.x + (self.direction*1),self.y)):
+                self.eligible.append((self.x + (2 * self.direction), self.y))
+        self.eligible = self.eligible + self.adjacent_capture_possible(board)
         return self.eligible
 
     def is_move_legal(self, pos, board):

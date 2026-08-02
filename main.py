@@ -24,6 +24,7 @@ class Game:
     def play(self):
         for row in self.board.board_state:
             print(row)
+        print("===============================================")
         self.move_piece((1,1), (3,1))
         for row in self.board.board_state:
             print(row)
