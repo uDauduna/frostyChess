@@ -2,9 +2,13 @@
 __pycache__/
 *.py[cod]
 *$py.class
-# Ignore virtual environments
+
+# Ignore virtual environments (directories)
 venv/
 .venv/
 env/
-.env/
 ENV/
+
+# Ignore environment variable files (secrets)
+.env
+.env.local
