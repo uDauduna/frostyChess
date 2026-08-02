@@ -9,7 +9,7 @@ class Pawn:
 
     def adjacent_capture_possible(self, board):
         """
-        Fix this function to check individual squares
+        Add En passant
         """
         eligible = []
         if board.pieces[self.x + (1 * self.direction)][self.y - (1*self.direction)] != ".":
