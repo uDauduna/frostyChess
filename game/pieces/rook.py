@@ -35,7 +35,6 @@ class Rook:
                 break
         row, col = self.row, self.col
         while col >= 0:
-            row += 1
             col -= 1 
             if board.square_is_empty((row, col)):
                 self.eligible.append((row, col))
@@ -45,8 +44,6 @@ class Rook:
                 break
 
         return self.eligible
-
-
 
     def in_bounds(self, row, col):
         if row >= 0 and row < 8:
