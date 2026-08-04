@@ -6,10 +6,10 @@ SCREEN_WIDTH = 1280
 SCREEN_HEIGHT = 720
 SQUARE_SIZE = 80
 BOARD_SIZE = 640
-# DARK_SQUARE = (92, 64, 51)
-DARK_SQUARE = "brown"
+DARK_SQUARE = (54, 69, 79)
+# DARK_SQUARE = "grey"
 LIGHT_SQUARE = "white"
-BACKGROUND_COLOR = "navy"
+BACKGROUND_COLOR = (44, 57, 66)
 
 # pygame setup
 
@@ -25,7 +25,7 @@ image = pygame.image.load('assets/b-bishop.png').convert_alpha()
 width = image.get_rect().width
 height = image.get_rect().height
 print(width, height)
-bishop = pygame.transform.scale(image, (width*0.125,width*0.125))
+bishop = pygame.transform.scale(image, (height*0.125,width*0.125))
 sprite_rect = bishop.get_rect()
 sprite_rect.center = (440, 80)
 
