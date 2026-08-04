@@ -1,5 +1,6 @@
 # Example file showing a circle moving on screen
 import pygame
+import sprite
 
 #constants
 SCREEN_WIDTH = 1280
@@ -7,7 +8,6 @@ SCREEN_HEIGHT = 720
 SQUARE_SIZE = 80
 BOARD_SIZE = 640
 DARK_SQUARE = (54, 69, 79)
-# DARK_SQUARE = "grey"
 LIGHT_SQUARE = "white"
 BACKGROUND_COLOR = (44, 57, 66)
 
@@ -16,6 +16,7 @@ BACKGROUND_COLOR = (44, 57, 66)
 
 pygame.init()
 screen = pygame.display.set_mode((1280, 720))
+pygame.display.set_caption("frostyChess")
 board = pygame.Surface((BOARD_SIZE + 4, BOARD_SIZE + 4))
 clock = pygame.time.Clock()
 running = True
@@ -24,7 +25,6 @@ dt = 0
 image = pygame.image.load('assets/b-bishop.png').convert_alpha()
 width = image.get_rect().width
 height = image.get_rect().height
-print(width, height)
 bishop = pygame.transform.scale(image, (height*0.125,width*0.125))
 sprite_rect = bishop.get_rect()
 sprite_rect.center = (440, 80)
@@ -40,6 +40,8 @@ def draw_board():
             square = pygame.Rect(2+col* SQUARE_SIZE,2 + row* SQUARE_SIZE, SQUARE_SIZE, SQUARE_SIZE)
             pygame.draw.rect(board, color, square)
 
+b1 = sprite.Piece("bishop", "black")
+
 while running:
     # poll for events
     # pygame.QUIT event means the user clicked X to close your window
@@ -53,6 +55,7 @@ while running:
     draw_board()
     screen.blit(board, (318, 38))
     screen.blit(bishop, sprite_rect)
+    screen.blit(b1.image, b1.rect)
     
 
     # flip() the display to put your work on screen

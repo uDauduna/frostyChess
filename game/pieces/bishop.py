@@ -1,5 +1,8 @@
-class Bishop:
+from ..ui.sprite import Piece
+
+class Bishop(Piece):
     def __init__(self, pos, color):
+        super().__init__("bishop",color, pos)
         self.row, self.col = pos
         self.color = color
         self.eligible = []
