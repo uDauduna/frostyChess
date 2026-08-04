@@ -7,8 +7,8 @@ SCREEN_HEIGHT = 720
 SQUARE_SIZE = 80
 BOARD_SIZE = 640
 # DARK_SQUARE = (92, 64, 51)
-DARK_SQUARE = "black"
-LIGHT_SQUARE = "grey"
+DARK_SQUARE = "brown"
+LIGHT_SQUARE = "white"
 BACKGROUND_COLOR = "navy"
 
 # pygame setup
@@ -20,6 +20,15 @@ board = pygame.Surface((BOARD_SIZE + 4, BOARD_SIZE + 4))
 clock = pygame.time.Clock()
 running = True
 dt = 0
+
+image = pygame.image.load('assets/b-bishop.png').convert_alpha()
+width = image.get_rect().width
+height = image.get_rect().height
+print(width, height)
+bishop = pygame.transform.scale(image, (width*0.125,width*0.125))
+sprite_rect = bishop.get_rect()
+sprite_rect.center = (440, 80)
+
 
 def draw_board():
     for row in range(8):
@@ -43,6 +52,7 @@ while running:
     board.fill("white")
     draw_board()
     screen.blit(board, (318, 38))
+    screen.blit(bishop, sprite_rect)
     
 
     # flip() the display to put your work on screen
