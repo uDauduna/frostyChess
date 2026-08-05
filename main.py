@@ -22,7 +22,6 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
         self.dt = 0
-        self.board.initialize_Pieces()
 
     def draw_board(self):
         for row in range(8):
@@ -36,25 +35,27 @@ class Game:
         return
 
     def move_piece(self, old_pos, new_pos):
-        if self.board.board_state[old_pos[0]][old_pos[1]] == ".":
-            print("Illegal move")
-        else:
+        if self.board.board_state[old_pos[0]][old_pos[1]] != ".":
             piece_type = self.board.board_state[old_pos[0]][old_pos[1]]
             piece = self.board.pieces[old_pos[0]][old_pos[1]]
             if piece.is_move_legal(new_pos, self.board):
+                print(self.board.pieces)
+                print(self.board.piece_group)
                 self.board.board_state[old_pos[0]][old_pos[1]] = "."
                 self.board.pieces[old_pos[0]][old_pos[1]] = "."
-                print(piece_type, old_pos, new_pos)
                 if piece_type.lower() == "p" and (new_pos[0] == 0  or new_pos[0] == 7):
                     piece_type, piece = self.board.promote_piece(new_pos)
+                piece.update_position(new_pos)
                 self.board.board_state[new_pos[0]][new_pos[1]] = piece_type
                 self.board.pieces[new_pos[0]][new_pos[1]] = piece
-                piece.update_position(new_pos)
+
+                print(self.board.pieces)
+                print(self.board.piece_group)
             else:
                 """
                 We can't raise an error
                 """
-                print("Illegal Move")
+                
 
         return
 
@@ -89,17 +90,7 @@ class Game:
             self.draw_board()
             self.screen.blit(self.board_surface, (318, 38))
             self.board.piece_group.draw(self.screen)
-
-            if random.randint(0, 10) < 3:
-                self.move_piece((6,1), (7,1))
-            elif random.randint(0, 10)< 6:
-                self.move_piece((0,1), (2,2))
-            else:
-                self.move_piece((0,1), (1,3))
-            for row in self.board.board_state:
-                print(row)
-            print("===============================================")
-            time.sleep(5)
+            self.move_piece((0,1), (2,2))
             # flip() the display to put your work on screen
             pygame.display.flip()
 
