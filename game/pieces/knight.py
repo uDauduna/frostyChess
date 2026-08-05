@@ -6,24 +6,40 @@ class Knight(Piece):
         self.row, self.col = pos
         self.color = color
 
+    def safe_to_occupy(self, board):
+        if board.square_is_empty((self.row, self.col)):
+            return True
+        else:
+            if board.pieces[self.row][self.col].color != self.color:
+                return True
+        return False
+
     def eligible_moves(self, board):
         self.eligible = []
         if self.in_bounds(self.row - 1, self.col - 2):
-            self.eligible.append((self.row - 1, self.col - 2))
+            if self.safe_to_occupy(board):
+                self.eligible.append((self.row - 1, self.col - 2))
         if self.in_bounds(self.row + 1, self.col - 2):
-            self.eligible.append((self.row + 1, self.col -2))
+            if self.safe_to_occupy(board):
+                self.eligible.append((self.row + 1, self.col -2))
         if self.in_bounds(self.row - 2, self.col - 1):
-            self.eligible.append((self.row - 2, self.col - 1))
+            if self.safe_to_occupy(board):
+                self.eligible.append((self.row - 2, self.col - 1))
         if self.in_bounds(self.row + 2, self.col - 1):
-            self.eligible.append((self.row + 2, self.col - 1))
+            if self.safe_to_occupy(board):
+                self.eligible.append((self.row + 2, self.col - 1))
         if self.in_bounds(self.row - 1, self.col + 2):
-            self.eligible.append((self.row - 1, self.col + 2))
+            if self.safe_to_occupy(board):
+                self.eligible.append((self.row - 1, self.col + 2))
         if self.in_bounds(self.row - 2, self.col + 1):
-            self.eligible.append((self.row - 2, self.col + 1))
+            if self.safe_to_occupy(board):
+                self.eligible.append((self.row - 2, self.col + 1))
         if self.in_bounds(self.row + 1, self.col + 2):
-            self.eligible.append((self.row + 1, self.col + 2))
+            if self.safe_to_occupy(board):
+                self.eligible.append((self.row + 1, self.col + 2))
         if self.in_bounds(self.row + 2, self.col + 1):
-            self.eligible.append((self.row + 2, self.col + 1))
+            if self.safe_to_occupy(board):
+                self.eligible.append((self.row + 2, self.col + 1))
         return self.eligible
 
     def in_bounds(self, row, col):
@@ -40,4 +56,5 @@ class Knight(Piece):
 
     def update_position(self, new_pos):
         self.row, self.col = new_pos
+        self.update_board_position(new_pos)
         return
