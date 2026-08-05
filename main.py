@@ -106,7 +106,10 @@ class Game:
 
         # First click
         if self.selected_square is None:
-            self.selected_square = self.clicked_square
+            if self.board.board_state[self.clicked_square[0]][self.clicked_square[1]] == ".":
+                self.selected_square = None
+            else:
+                self.selected_square = self.clicked_square
             print(f"Selected: {self.selected_square}")
             return
 
@@ -119,6 +122,9 @@ class Game:
         # Second click
         self.source_square = self.selected_square
         self.target_square = self.clicked_square
+
+        self.move_piece(self.source_square, self.target_square)
+
 
         print(f"Move: {self.source_square} -> {self.target_square}")
 
@@ -141,20 +147,21 @@ class Game:
                 width=4,
             )
 
-    def draw_legal_moves(self, legal_moves):
-        radius = 10
+    def draw_legal_moves(self):
+        if self.source_square:
+            radius = 10
 
-        for row, col in legal_moves:
+            for row, col in self.legal_moves:
 
-            center_x = col * 80 + 40 + 2
-            center_y = row * 80 + 40 + 2
+                center_x = col * 80 + 40 + 2
+                center_y = row * 80 + 40 + 2
 
-            pygame.draw.circle(
-                self.board_surface,
-                (50, 200, 50),
-                (center_x, center_y),
-                radius
-            )
+                pygame.draw.circle(
+                    self.board_surface,
+                    (50, 200, 50),
+                    (center_x, center_y),
+                    radius
+                )
 
     def render_game(self):
         while self.running:
@@ -174,10 +181,9 @@ class Game:
             self.board_surface.fill("white")
             self.draw_board()
             self.draw_selected_square()
-            # self.draw_legal_moves(legal_moves)
+            #self.draw_legal_moves(legal_moves)
             self.screen.blit(self.board_surface, (318, 38))
             self.board.piece_group.draw(self.screen)
-            self.move_piece((0,1), (2,2))
             pygame.display.flip()
             # limits FPS to 60
             # dt is delta time in seconds since last frame, used for framerate-
