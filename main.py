@@ -27,7 +27,8 @@ class Game:
         self.selected_square = None
         self.source_square = None
         self.target_square = None
-        self.legals_squares = None 
+        self.legal_squares = None 
+        self.clicked_piece = None
 
     def draw_board(self):
         for row in range(8):
@@ -148,14 +149,14 @@ class Game:
             )
 
     def draw_legal_moves(self):
-        if self.source_square:
+        if self.selected_square:
+            self.clicked_piece = self.board.pieces[self.selected_square[0]][self.selected_square[1]]
+            self.legal_squares = self.clicked_piece.eligible_moves(self.board)
             radius = 10
-
-            for row, col in self.legal_moves:
-
+            print("print")
+            for row, col in self.legal_squares:
                 center_x = col * 80 + 40 + 2
                 center_y = row * 80 + 40 + 2
-
                 pygame.draw.circle(
                     self.board_surface,
                     (50, 200, 50),
@@ -181,7 +182,7 @@ class Game:
             self.board_surface.fill("white")
             self.draw_board()
             self.draw_selected_square()
-            #self.draw_legal_moves(legal_moves)
+            self.draw_legal_moves()
             self.screen.blit(self.board_surface, (318, 38))
             self.board.piece_group.draw(self.screen)
             pygame.display.flip()
