@@ -2,7 +2,8 @@ from game.board import Board
 import pygame
 from game.ui.sprite import Piece
 from game.board import Board
-
+import random
+import time
 
 class Game:
     def __init__(self, timed = False):
@@ -89,8 +90,16 @@ class Game:
             self.screen.blit(self.board_surface, (318, 38))
             self.board.piece_group.draw(self.screen)
 
-            
-
+            if random.randint(0, 10) < 3:
+                self.move_piece((6,1), (7,1))
+            elif random.randint(0, 10)< 6:
+                self.move_piece((0,1), (2,2))
+            else:
+                self.move_piece((0,1), (1,3))
+            for row in self.board.board_state:
+                print(row)
+            print("===============================================")
+            time.sleep(5)
             # flip() the display to put your work on screen
             pygame.display.flip()
 

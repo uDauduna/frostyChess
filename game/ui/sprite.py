@@ -23,3 +23,9 @@ class Piece(pygame.sprite.Sprite):
         pref = "b" if self.color == "black" else "w"
         path = f'game/assets/{pref}-{self.piece}.png'
         return path
+
+    def update_board_position(self, pos):
+        self.center_x = 320 + (pos[1] * 80) + 40
+        self.center_y = 40 + (pos[0] * 80) + 40
+        self.rect.center = (self.center_x, self.center_y)
+        return

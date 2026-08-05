@@ -97,4 +97,5 @@ class Queen(Piece):
 
     def update_position(self, new_pos):
         self.row, self.col = new_pos
+        self.update_board_position(new_pos)
         return
