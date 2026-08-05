@@ -11,8 +11,10 @@ class Game:
         self.SCREEN_HEIGHT = 720
         self.SQUARE_SIZE = 80
         self.BOARD_SIZE = 640
-        self.DARK_SQUARE = (54, 69, 79)
-        self.LIGHT_SQUARE = "white"
+        self.BOARD_X = 320
+        self.BOARD_Y = 40
+        self.DARK_SQUARE = (181, 136, 99)
+        self.LIGHT_SQUARE = (240, 217, 181) 
         self.BACKGROUND_COLOR = (44, 57, 66)
         pygame.init()
         self.screen = pygame.display.set_mode((1280, 720))
@@ -22,6 +24,10 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
         self.dt = 0
+        self.selected_square = None
+        self.source_square = None
+        self.target_square = None
+        self.legals_squares = None 
 
     def draw_board(self):
         for row in range(8):
@@ -76,6 +82,80 @@ class Game:
             print(row)
         return
 
+    def mouse_click(self, event):
+        """Convert a mouse click into a board square."""
+        mouse_x, mouse_y = event.pos
+        if (
+            self.BOARD_X <= mouse_x < self.BOARD_X + self.BOARD_SIZE
+            and self.BOARD_Y <= mouse_y < self.BOARD_Y + self.BOARD_SIZE
+        ):
+            col = (mouse_x - self.BOARD_X) // self.SQUARE_SIZE
+            row = (mouse_y - self.BOARD_Y) // self.SQUARE_SIZE
+            self.clicked_square = (row, col)
+            print(f"Clicked square: {self.clicked_square}")
+        else:
+            print("Clicked outside board")
+        return None
+
+    def handle_click(self):
+        """Simple two-click move logic."""
+        # Clicked outside the board
+        if self.clicked_square is None:
+            self.selected_square = None
+            return
+
+        # First click
+        if self.selected_square is None:
+            self.selected_square = self.clicked_square
+            print(f"Selected: {self.selected_square}")
+            return
+
+        # Clicked the same square again
+        if self.clicked_square == self.selected_square:
+            print("Selection cleared")
+            self.selected_square = None
+            return
+
+        # Second click
+        self.source_square = self.selected_square
+        self.target_square = self.clicked_square
+
+        print(f"Move: {self.source_square} -> {self.target_square}")
+
+        # move_piece(source_square, target_square)
+
+        self.selected_square = None
+
+    def draw_selected_square(self):
+        if self.selected_square is not None:
+            row, col = self.selected_square
+            pygame.draw.rect(
+                self.board_surface,
+                (50, 205, 50),
+                (
+                    2 + col * self.SQUARE_SIZE,
+                    2 + row * self.SQUARE_SIZE,
+                    self.SQUARE_SIZE,
+                    self.SQUARE_SIZE,
+                ),
+                width=4,
+            )
+
+    def draw_legal_moves(self, legal_moves):
+        radius = 10
+
+        for row, col in legal_moves:
+
+            center_x = col * 80 + 40 + 2
+            center_y = row * 80 + 40 + 2
+
+            pygame.draw.circle(
+                self.board_surface,
+                (50, 200, 50),
+                (center_x, center_y),
+                radius
+            )
+
     def render_game(self):
         while self.running:
             # poll for events
@@ -83,17 +163,22 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+
+                    if event.button == 1:
+                        self.mouse_click(event)
+                        self.handle_click()
 
             # fill the screen with a color to wipe away anything from last frame
             self.screen.fill(self.BACKGROUND_COLOR)
             self.board_surface.fill("white")
             self.draw_board()
+            self.draw_selected_square()
+            # self.draw_legal_moves(legal_moves)
             self.screen.blit(self.board_surface, (318, 38))
             self.board.piece_group.draw(self.screen)
             self.move_piece((0,1), (2,2))
-            # flip() the display to put your work on screen
             pygame.display.flip()
-
             # limits FPS to 60
             # dt is delta time in seconds since last frame, used for framerate-
             # independent physics.
@@ -103,3 +188,9 @@ class Game:
 
 game = Game()
 game.render_game()
+
+
+# SELECTED_COLOR = (50, 205, 50)      # Lime green
+# LEGAL_MOVE_COLOR = (30, 144, 255)   # Dodger blue
+# CAPTURE_COLOR = (220, 20, 60)       # Crimson
+# LAST_MOVE_COLOR = (255, 215, 0)     # Gold
