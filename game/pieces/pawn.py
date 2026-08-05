@@ -1,6 +1,6 @@
 from ..ui.sprite import Piece
 
-class Pawn:
+class Pawn(Piece):
     def __init__(self, pos, color):
         super().__init__("pawn", color, pos)
         self.color = color

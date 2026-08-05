@@ -4,6 +4,7 @@ from .pieces.bishop import Bishop
 from .pieces.rook import Rook
 from .pieces.king import King
 from .pieces.queen import Queen
+import pygame
 
 
 class Board:
@@ -46,10 +47,13 @@ class Board:
                       [".", ".", ".", ".", ".", ".", ".", "."],
                       [".", ".", ".", ".", ".", ".", ".", "."],
                       ]
+        self.piece_group = pygame.sprite.Group()
         self.initialize_Pieces()
         self.black_in_check = False
         self.white_in_check = False
         self.clock = clock
+        
+
 
     def initialize_Pieces(self):
         for row in range(len(self.board_state)):
@@ -58,17 +62,19 @@ class Board:
                 if piece_type != ".":
                     color = "black" if piece_type.islower() else "white"
                     if piece_type.lower() == "p":
-                        self.pieces[row][col] = Pawn((row, col), color)
+                        piece = Pawn((row, col), color)
                     elif piece_type.lower() == "r":
-                        self.pieces[row][col] = Rook((row, col), color)
+                        piece = Rook((row, col), color)
                     elif piece_type.lower() == "n":
-                        self.pieces[row][col] = Knight((row, col), color)
+                        piece = Knight((row, col), color)
                     elif piece_type.lower() == "b":
-                        self.pieces[row][col] = Bishop((row, col), color)
+                        piece = Bishop((row, col), color)
                     elif piece_type.lower() == "k":
-                        self.pieces[row][col] = King((row, col), color)
+                        piece = King((row, col), color)
                     elif piece_type.lower() == "q":
-                        self.pieces[row][col] = Queen((row, col), color)
+                        piece = Queen((row, col), color)
+                    self.pieces[row][col] = piece
+                    self.piece_group.add(piece)
         return
 
 

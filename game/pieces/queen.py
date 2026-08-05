@@ -1,8 +1,8 @@
 from ..ui.sprite import Piece
 
-class Queen:
+class Queen(Piece):
     def __init__(self, pos, color):
-        super.__init__("queen", color, pos)
+        super().__init__("queen", color, pos)
         self.color = color
         self.row, self.col = pos
 

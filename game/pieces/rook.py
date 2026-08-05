@@ -1,6 +1,6 @@
 from ..ui.sprite import Piece
 
-class Rook:
+class Rook(Piece):
     def __init__(self, pos, color):
         super().__init__("rook", color, pos)
         self.row, self.col = pos
