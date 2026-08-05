@@ -10,8 +10,10 @@ class Rook(Piece):
     def eligible_moves(self, board):
         self.eligible = []
         row, col = self.row, self.col
-        while row < 8 :
+        while True:
             row += 1
+            if row >= 8:
+                break
             if board.square_is_empty((row, col)):
                 self.eligible.append((row, col))
             else:
@@ -19,8 +21,10 @@ class Rook(Piece):
                     self.eligible.append((row, col))
                 break
         row, col = self.row, self.col
-        while row >= 0:
+        while True:
             row -= 1
+            if row < 0:
+                break
             if board.square_is_empty((row, col)):
                 self.eligible.append((row, col))
             else:
@@ -28,8 +32,10 @@ class Rook(Piece):
                     self.eligible.append((row, col))
                 break
         row, col = self.row, self.col
-        while col < 8:
-            col += 1 
+        while True:
+            col += 1
+            if col >= 8:
+                break
             if board.square_is_empty((row, col)):
                 self.eligible.append((row, col))
             else:
@@ -37,8 +43,10 @@ class Rook(Piece):
                     self.eligible.append((row, col))
                 break
         row, col = self.row, self.col
-        while col >= 0:
-            col -= 1 
+        while True:
+            col -= 1
+            if col < 0:
+                break
             if board.square_is_empty((row, col)):
                 self.eligible.append((row, col))
             else:
@@ -55,10 +63,7 @@ class Rook(Piece):
         return False
 
     def is_move_legal(self, pos, board):
-        self.eligible = self.eligible_moves(board)
-        if pos in self.eligible:
-            return True
-        return False
+        return pos in self.eligible_moves(board)
 
     def update_position(self, new_pos):
         self.row, self.col = new_pos

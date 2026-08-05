@@ -14,61 +14,29 @@ class King(Piece):
         self.eligible = []
         row, col = self.row, self.col
 
-        if board.square_is_empty((row - 1, col - 1)):
-            self.eligible.append((row, col))
-        else:
-            if board.pieces[row][col].color != self.color:
-                self.eligible.append((row, col))
+        directions = [
+            (-1, -1), (-1, 0), (-1, 1),
+            (0, -1),           (0, 1),
+            (1, -1),  (1, 0),  (1, 1)
+        ]
 
-        if board.square_is_empty((row - 1, col)):
-            self.eligible.append((row, col))
-        else:
-            if board.pieces[row][col].color != self.color:
-                self.eligible.append((row, col))
+        for dr, dc in directions:
+            new_row = row + dr
+            new_col = col + dc
 
-        if board.square_is_empty((row - 1, col + 1)):
-            self.eligible.append((row, col))
-        else:
-            if board.pieces[row][col].color != self.color:
-                self.eligible.append((row, col))
+            if not (0 <= new_row < 8 and 0 <= new_col < 8):
+                continue
 
-        if board.square_is_empty((row , col - 1)):
-            self.eligible.append((row, col))
-        else:
-            if board.pieces[row][col].color != self.color:
-                self.eligible.append((row, col))
+            if board.square_is_empty((new_row, new_col)):
+                self.eligible.append((new_row, new_col))
+            else:
+                if board.pieces[new_row][new_col].color != self.color:
+                    self.eligible.append((new_row, new_col))
 
-        if board.square_is_empty((row, col + 1)):
-            self.eligible.append((row, col))
-        else:
-            if board.pieces[row][col].color != self.color:
-                self.eligible.append((row, col))
-
-        if board.square_is_empty((row + 1, col - 1)):
-            self.eligible.append((row, col))
-        else:
-            if board.pieces[row][col].color != self.color:
-                self.eligible.append((row, col))
-
-        if board.square_is_empty((row + 1, col)):
-            self.eligible.append((row, col))
-        else:
-            if board.pieces[row][col].color != self.color:
-                self.eligible.append((row, col))
-
-        if board.square_is_empty((row + 1, col + 1)):
-            self.eligible.append((row, col))
-        else:
-            if board.pieces[row][col].color != self.color:
-                self.eligible.append((row, col))
-
-        return
+        return self.eligible
    
     def is_move_legal(self, pos, board):
-        self.eligible = self.eligible_moves(board)
-        if pos in self.eligible:
-            return True
-        return False
+        return pos in self.eligible_moves(board)
 
     def update_position(self, new_pos):
         self.row, self.y = new_pos

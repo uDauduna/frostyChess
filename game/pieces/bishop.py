@@ -10,9 +10,11 @@ class Bishop(Piece):
     def eligible_moves(self, board):
         self.eligible = []
         row, col = self.row, self.col
-        while (row < 8 and col < 8):
+        while True:
             row += 1
-            col += 1 
+            col += 1
+            if row >= 8 or col >= 8:
+                break
             if board.square_is_empty((row, col)):
                 self.eligible.append((row, col))
             else:
@@ -20,9 +22,11 @@ class Bishop(Piece):
                     self.eligible.append((row, col))
                 break
         row, col = self.row, self.col
-        while (row >= 0 and col >= 0):
+        while True:
             row -= 1
-            col -= 1 
+            col -= 1
+            if row < 0 or col < 0:
+                break
             if board.square_is_empty((row, col)):
                 self.eligible.append((row, col))
             else:
@@ -30,9 +34,11 @@ class Bishop(Piece):
                     self.eligible.append((row, col))
                 break
         row, col = self.row, self.col
-        while (row >= 0 and col < 8):
+        while True:
             row -= 1
-            col += 1 
+            col += 1
+            if row < 0 or col >= 8:
+                break
             if board.square_is_empty((row, col)):
                 self.eligible.append((row, col))
             else:
@@ -40,9 +46,11 @@ class Bishop(Piece):
                     self.eligible.append((row, col))
                 break
         row, col = self.row, self.col
-        while (row < 8 and col >= 0):
+        while True:
             row += 1
-            col -= 1 
+            col -= 1
+            if row >= 8 or col < 0:
+                break
             if board.square_is_empty((row, col)):
                 self.eligible.append((row, col))
             else:
@@ -54,15 +62,12 @@ class Bishop(Piece):
 
     def in_bounds(self, row, col):
         if row >= 0 and row < 8:
-            if col < 8 and col < 8:
+            if col >=0 and col < 8:
                 return True
         return False
 
     def is_move_legal(self, pos, board):
-        self.eligible = self.eligible_moves(board)
-        if pos in self.eligible:
-            return True
-        return False
+        return pos in self.eligible_moves(board)
 
     def update_position(self, new_pos):
         self.row, self.col = new_pos

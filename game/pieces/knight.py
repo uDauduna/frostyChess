@@ -50,10 +50,7 @@ class Knight(Piece):
         return False
 
     def is_move_legal(self, pos, board):
-        self.eligible = self.eligible_moves(board)
-        if pos in self.eligible:
-            return True
-        return False
+        return pos in self.eligible_moves(board)
 
     def update_position(self, new_pos):
         self.row, self.col = new_pos
