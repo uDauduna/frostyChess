@@ -19,11 +19,9 @@ class King(Piece):
             (0, -1),           (0, 1),
             (1, -1),  (1, 0),  (1, 1)
         ]
-
         for dr, dc in directions:
             new_row = row + dr
             new_col = col + dc
-
             if not (0 <= new_row < 8 and 0 <= new_col < 8):
                 continue
 
@@ -32,14 +30,13 @@ class King(Piece):
             else:
                 if board.pieces[new_row][new_col].color != self.color:
                     self.eligible.append((new_row, new_col))
-
         return self.eligible
    
     def is_move_legal(self, pos, board):
         return pos in self.eligible_moves(board)
 
     def update_position(self, new_pos):
-        self.row, self.y = new_pos
+        self.row, self.col = new_pos
         self.update_board_position(new_pos)
         return
 

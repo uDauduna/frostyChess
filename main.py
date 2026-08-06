@@ -48,6 +48,8 @@ class Game:
             if piece.is_move_legal(new_pos, self.board):
                 print(self.board.pieces)
                 print(self.board.piece_group)
+                if not self.board.square_is_empty(new_pos):
+                    self.capture(new_pos)
                 self.board.board_state[old_pos[0]][old_pos[1]] = "."
                 self.board.pieces[old_pos[0]][old_pos[1]] = "."
                 if piece_type.lower() == "p" and (new_pos[0] == 0  or new_pos[0] == 7):
@@ -64,6 +66,14 @@ class Game:
                 """
                 
 
+        return
+
+    def capture(self, pos):
+        piece = self.board.pieces[pos[0]][pos[1]]
+        if piece != ".":
+            piece.kill()
+        self.board.board_state[pos[0]][pos[1]] = "."
+        self.board.pieces[pos[0]][pos[1]] = "."
         return
 
     def play(self):
@@ -153,7 +163,6 @@ class Game:
             self.clicked_piece = self.board.pieces[self.selected_square[0]][self.selected_square[1]]
             self.legal_squares = self.clicked_piece.eligible_moves(self.board)
             radius = 10
-            print("print")
             for row, col in self.legal_squares:
                 center_x = col * 80 + 40 + 2
                 center_y = row * 80 + 40 + 2
