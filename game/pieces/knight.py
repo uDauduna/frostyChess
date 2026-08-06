@@ -40,7 +40,6 @@ class Knight(Piece):
         if self.in_bounds(self.row + 2, self.col + 1):
             if self.safe_to_occupy(board, self.row + 2, self.col + 1):
                 self.eligible.append((self.row + 2, self.col + 1))
-        print(self.eligible)
         return self.eligible
 
     def in_bounds(self, row, col):

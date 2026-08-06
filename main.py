@@ -4,6 +4,7 @@ from game.ui.sprite import Piece
 from game.board import Board
 import random
 import time
+from game.ui.promotion_ui import PromotionUI
 
 class Game:
     def __init__(self, timed = False):
@@ -29,6 +30,13 @@ class Game:
         self.target_square = None
         self.legal_squares = None 
         self.clicked_piece = None
+        self.turn = "white"
+        self.selected_piece = None
+        self.game_over = False
+        self.in_check = False
+        self.winner = None
+        self.en_passant_square = None
+        self.promotion_ui = PromotionUI()
 
     def draw_board(self):
         for row in range(8):
@@ -46,20 +54,24 @@ class Game:
             piece_type = self.board.board_state[old_pos[0]][old_pos[1]]
             piece = self.board.pieces[old_pos[0]][old_pos[1]]
             if piece.is_move_legal(new_pos, self.board):
-                print(self.board.pieces)
-                print(self.board.piece_group)
+                # print(self.board.pieces)
+                # print(self.board.piece_group)
                 if not self.board.square_is_empty(new_pos):
                     self.capture(new_pos)
                 self.board.board_state[old_pos[0]][old_pos[1]] = "."
                 self.board.pieces[old_pos[0]][old_pos[1]] = "."
                 if piece_type.lower() == "p" and (new_pos[0] == 0  or new_pos[0] == 7):
-                    piece_type, piece = self.board.promote_piece(new_pos)
-                piece.update_position(new_pos)
+                    piece.update_position(new_pos)
+                    self.board.board_state[new_pos[0]][new_pos[1]] = piece_type
+                    self.board.pieces[new_pos[0]][new_pos[1]] = piece
+                    self.promotion_ui.open(piece)
+                    return
+                piece.update_position(new_pos)               
                 self.board.board_state[new_pos[0]][new_pos[1]] = piece_type
                 self.board.pieces[new_pos[0]][new_pos[1]] = piece
 
-                print(self.board.pieces)
-                print(self.board.piece_group)
+                # print(self.board.pieces)
+                # print(self.board.piece_group)
             else:
                 """
                 We can't raise an error
@@ -180,6 +192,13 @@ class Game:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.running = False
+                if self.promotion_ui.active:
+                            if event.type == pygame.MOUSEBUTTONDOWN:
+                                choice = self.promotion_ui.handle_click(event)
+                                if choice is not None:
+                                    self.board.promote_piece( self.promotion_ui.pawn,choice)
+                                    self.promotion_ui.close()
+                            continue
                 elif event.type == pygame.MOUSEBUTTONDOWN:
 
                     if event.button == 1:
@@ -189,11 +208,16 @@ class Game:
             # fill the screen with a color to wipe away anything from last frame
             self.screen.fill(self.BACKGROUND_COLOR)
             self.board_surface.fill("white")
-            self.draw_board()
-            self.draw_selected_square()
-            self.draw_legal_moves()
-            self.screen.blit(self.board_surface, (318, 38))
-            self.board.piece_group.draw(self.screen)
+            if self.promotion_ui.active:
+                self.promotion_ui.draw(self.screen)
+            else:
+                self.draw_board()
+                self.board.piece_group.draw(self.screen)
+                self.draw_selected_square()
+                self.draw_legal_moves()
+                self.screen.blit(self.board_surface, (318, 38))
+                self.board.piece_group.draw(self.screen)
+
             pygame.display.flip()
             # limits FPS to 60
             # dt is delta time in seconds since last frame, used for framerate-

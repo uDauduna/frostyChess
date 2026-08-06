@@ -52,7 +52,7 @@ class Board:
         self.black_in_check = False
         self.white_in_check = False
         self.clock = clock
-        
+        self.promotion = False
 
 
     def initialize_Pieces(self):
@@ -89,20 +89,18 @@ class Board:
             return True
         return False
 
-    def promote_piece(self, pos):
-        print("here")
-        color = "black" if pos[0] == 7 else "white"
-        print("Your pawn is eligible for promotion!!!!")
-        promoted_piece = "q" if pos[0] == 7 else "Q"  # implement UI logic
-        if promoted_piece.lower() == "q":
-            new_piece = Queen(pos, color)
-        elif promoted_piece.lower() == "r":
-            new_piece = Rook(pos, color)
-        elif promoted_piece.lower() == "b":
-            new_piece = Bishop(pos, color)
-        else:
-            new_piece = Knight(pos, color)
-        return promoted_piece, new_piece
+    def promote_piece(self, pawn, promoted_piece):
+        pieces = {
+            "q": Queen,
+            "r": Rook,
+            "b": Bishop,
+            "n": Knight,
+        }
+        new_piece = pieces[promoted_piece.lower()]((pawn.row, pawn.col),pawn.color)
+        pawn.kill()
+        self.pieces[pawn.row][pawn.col] = new_piece
+        self.board_state[pawn.row][pawn.col] = promoted_piece
+        self.piece_group.add(new_piece)
 
     def timer(self):
         """
