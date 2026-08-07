@@ -38,6 +38,13 @@ class Game:
         self.en_passant_square = None
         self.promotion_ui = PromotionUI()
 
+    def switch_turns(self):
+        if self.turn == "white":
+            self.turn = "black"
+        else:
+            self.turn = "white"
+        return
+
     def draw_board(self):
         for row in range(8):
             for col in range(8):
@@ -69,6 +76,7 @@ class Game:
                 piece.update_position(new_pos)               
                 self.board.board_state[new_pos[0]][new_pos[1]] = piece_type
                 self.board.pieces[new_pos[0]][new_pos[1]] = piece
+                self.switch_turns()
 
                 # print(self.board.pieces)
                 # print(self.board.piece_group)
@@ -132,8 +140,9 @@ class Game:
             if self.board.board_state[self.clicked_square[0]][self.clicked_square[1]] == ".":
                 self.selected_square = None
             else:
-                self.selected_square = self.clicked_square
-            print(f"Selected: {self.selected_square}")
+                if self.board.pieces[self.clicked_square[0]][self.clicked_square[1]].color == self.turn:
+                    self.selected_square = self.clicked_square
+                    print(f"Selected: {self.selected_square}")
             return
 
         # Clicked the same square again
