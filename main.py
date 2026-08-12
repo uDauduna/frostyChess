@@ -33,10 +33,11 @@ class Game:
         self.turn = "white"
         self.selected_piece = None
         self.game_over = False
-        self.in_check = False
         self.winner = None
         self.en_passant_square = None
         self.promotion_ui = PromotionUI()
+        self.white_in_check = False
+        self.black_in_check = False
 
     def switch_turns(self):
         if self.turn == "white":
@@ -44,6 +45,27 @@ class Game:
         else:
             self.turn = "white"
         return
+
+    def in_check(self):
+        opposition_squares = []
+        for row in self.board.pieces:
+            for piece in row:
+                if piece != ".":
+                    if piece.color != self.turn:
+                        opposition_squares.extend(piece.eligible_moves(self.board))
+
+        for square in opposition_squares:
+            if self.board.board_state[square[0]][square[1]].lower() == "k":
+                if self.turn == "black":
+                    self.black_in_check = True
+                else:
+                    self.white_in_check = True
+                return
+            else:
+                self.white_in_check = False
+                self.black_in_check = False
+
+        return 
 
     def draw_board(self):
         for row in range(8):
@@ -77,7 +99,9 @@ class Game:
                 self.board.board_state[new_pos[0]][new_pos[1]] = piece_type
                 self.board.pieces[new_pos[0]][new_pos[1]] = piece
                 self.switch_turns()
-
+                self.in_check()
+                print("White In Check", self.white_in_check)
+                print("Black In Check", self.black_in_check)
                 # print(self.board.pieces)
                 # print(self.board.piece_group)
             else:
