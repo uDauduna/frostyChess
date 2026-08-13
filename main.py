@@ -39,6 +39,17 @@ class Game:
         self.white_in_check = False
         self.black_in_check = False
 
+    def legal_moves(self):
+        """
+        Better for the board to keep track of which moves are legal
+        """
+        return
+
+    def simulate_move(self):
+        self.temp_board = []
+
+        return
+
     def switch_turns(self):
         if self.turn == "white":
             self.turn = "black"
@@ -47,6 +58,10 @@ class Game:
         return
 
     def in_check(self):
+        if self.turn == "black":
+            self.black_in_check = False
+        else:
+            self.white_in_check = False
         opposition_squares = []
         for row in self.board.pieces:
             for piece in row:
@@ -55,17 +70,15 @@ class Game:
                         opposition_squares.extend(piece.eligible_moves(self.board))
 
         for square in opposition_squares:
-            if self.board.board_state[square[0]][square[1]].lower() == "k":
+            piece = self.board.board_state[square[0]][square[1]]
+            if piece != "." and piece.lower() == "k":
                 if self.turn == "black":
                     self.black_in_check = True
                 else:
                     self.white_in_check = True
-                return
-            else:
-                self.white_in_check = False
-                self.black_in_check = False
+                return True
+        return False
 
-        return 
 
     def draw_board(self):
         for row in range(8):
