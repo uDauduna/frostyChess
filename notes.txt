@@ -66,3 +66,96 @@ Minimax
 Alpha-Beta pruning
 FEN notation
 PGN notation 
+
+
+                 frostyChess
+                      │
+           ┌──────────┴──────────┐
+           │                     │
+       Chess Engine          Pygame UI
+           │                     │
+     ┌─────┴─────┐               │
+     │           │               │
+   Rules       Board          Renderer
+     │           │               │
+   Move        Pieces          Sprites
+   History
+     │
+     ▼
+   AI later
+     │
+ ┌───┴──────────────┐
+ │                  │
+Minimax          Alpha-Beta
+                   │
+                   ▼
+              Evaluation
+
+
+
+
+             Pygame
+                │
+                ▼
+        ┌───────────────┐
+        │      UI       │
+        │   Renderer    │
+        │   Sprites     │
+        └───────┬───────┘
+                │
+                ▼
+        ┌───────────────┐
+        │  Chess Game   │
+        └───────┬───────┘
+                │
+                ▼
+        ┌───────────────┐
+        │ Chess Engine  │
+        │               │
+        │ Board         │
+        │ Pieces        │
+        │ Moves         │
+        │ Rules         │
+        └───────────────┘
+
+
+frostyChess/
+│
+├── main.py
+│
+├── game/
+│   ├── __init__.py
+│   │
+│   ├── board.py
+│   ├── chess_game.py
+│   ├── move.py
+│   ├── rules.py
+│   ├── constants.py
+│   │
+│   └── pieces/
+│       ├── __init__.py
+│       ├── piece.py
+│       ├── pawn.py
+│       ├── knight.py
+│       ├── bishop.py
+│       ├── rook.py
+│       ├── queen.py
+│       └── king.py
+│
+├── ui/
+│   ├── __init__.py
+│   ├── renderer.py
+│   ├── sprite.py
+│   └── promotion_ui.py
+│
+├── assets/
+│   └── ...
+│
+└── tests/
+    ├── test_board.py
+    ├── test_pawn.py
+    ├── test_knight.py
+    ├── test_bishop.py
+    ├── test_rook.py
+    ├── test_queen.py
+    └── test_king.py
