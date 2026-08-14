@@ -1,3 +1,0 @@
-"""
-Implement a clock
-"""
