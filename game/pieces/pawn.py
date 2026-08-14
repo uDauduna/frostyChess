@@ -1,55 +1,34 @@
-from ..ui.sprite import Piece
+from .piece import Piece
+from ..rules import in_bounds
+
 
 class Pawn(Piece):
-    def __init__(self, pos, color):
-        super().__init__("pawn", color, pos)
-        self.color = color
-        self.row, self.col = pos
-        self.promotion = False
-        self.eligible = []
-        self.direction = 1 if self.color == "black" else -1
+    def __init__(self, color, position):
+        super().__init__("pawn", color, position)
+        self.direction = 1 if color == "black" else -1
 
+    def pseudo_legal_moves(self, board):
+        moves = []
+        one_forward = (self.row + self.direction,self.col)
+        if in_bounds(*one_forward) and board.is_empty(one_forward):
+            moves.append(one_forward)
+            if self.is_on_starting_rank():
+                two_forward = (
+                    self.row + 2 * self.direction,self.col)
+                if (in_bounds(*two_forward)and board.is_empty(two_forward)):
+                    moves.append(two_forward)
 
-    def adjacent_capture_possible(self, board):
-        """
-        Add En passant
-        """
-        eligible = []
-        target_row = self.row + self.direction
-        if 0 <= target_row < 8:
-            if 0 <= self.col - 1 < 8:
-                piece = board.pieces[target_row][self.col - 1]
-                if piece != "." and piece.color != self.color:
-                    eligible.append((target_row, self.col - 1))
-            if 0 <= self.col + 1 < 8:
-                piece = board.pieces[target_row][self.col + 1]
-                if piece != "." and piece.color != self.color:
-                    eligible.append((target_row, self.col + 1))
-        return eligible
-    
-    def eligible_moves(self, board):
-        self.eligible = []
-        one_forward = (self.row + self.direction, self.col)
-        # One-square move
-        if (
-            0 <= one_forward[0] < 8
-            and board.square_is_empty(one_forward)
-        ):
-            self.eligible.append(one_forward)
-            if ((self.color == "black" and self.row == 1) or (self.color == "white" and self.row == 6)):
-                two_forward = (self.row + 2 * self.direction, self.col)
-                if (
-                    0 <= two_forward[0] < 8
-                    and board.square_is_empty(two_forward)
-                ):
-                    self.eligible.append(two_forward)
-        self.eligible.extend(self.adjacent_capture_possible(board))
-        return self.eligible
+        for position in self.attack_squares():
+            if not in_bounds(*position):
+                continue
+            target = board.get_piece(position)
+            if target is not None and target.color != self.color:
+                moves.append(position)
+        return moves
 
-    def is_move_legal(self, pos, board):
-        return pos in self.eligible_moves(board)
-
-    def update_position(self, new_pos):
-        self.row, self.col = new_pos
-        self.update_board_position(new_pos)
-        return
+    def attack_squares(self):
+        return [(self.row + self.direction,self.col - 1),(self.row + self.direction,self.col + 1)]
+    def is_on_starting_rank(self):
+        if self.color == "white":
+            return self.row == 6
+        return self.row == 1

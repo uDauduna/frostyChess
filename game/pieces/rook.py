@@ -1,71 +1,17 @@
-from ..ui.sprite import Piece
+from .piece import Piece
+from ..rules import sliding_moves
+
 
 class Rook(Piece):
-    def __init__(self, pos, color):
-        super().__init__("rook", color, pos)
-        self.row, self.col = pos
-        self.color = color
+    def __init__(self, color, position):
+        super().__init__("rook", color, position)
 
+    def pseudo_legal_moves(self, board):
+        directions = [
+            (-1, 0),
+            (1, 0),
+            (0, -1),
+            (0, 1),
+        ]
 
-    def eligible_moves(self, board):
-        self.eligible = []
-        row, col = self.row, self.col
-        while True:
-            row += 1
-            if row >= 8:
-                break
-            if board.square_is_empty((row, col)):
-                self.eligible.append((row, col))
-            else:
-                if board.pieces[row][col].color != self.color:
-                    self.eligible.append((row, col))
-                break
-        row, col = self.row, self.col
-        while True:
-            row -= 1
-            if row < 0:
-                break
-            if board.square_is_empty((row, col)):
-                self.eligible.append((row, col))
-            else:
-                if board.pieces[row][col].color != self.color:
-                    self.eligible.append((row, col))
-                break
-        row, col = self.row, self.col
-        while True:
-            col += 1
-            if col >= 8:
-                break
-            if board.square_is_empty((row, col)):
-                self.eligible.append((row, col))
-            else:
-                if board.pieces[row][col].color != self.color:
-                    self.eligible.append((row, col))
-                break
-        row, col = self.row, self.col
-        while True:
-            col -= 1
-            if col < 0:
-                break
-            if board.square_is_empty((row, col)):
-                self.eligible.append((row, col))
-            else:
-                if board.pieces[row][col].color != self.color:
-                    self.eligible.append((row, col))
-                break
-
-        return self.eligible
-
-    def in_bounds(self, row, col):
-        if row >= 0 and row < 8:
-            if col < 8 and col < 8:
-                return True
-        return False
-
-    def is_move_legal(self, pos, board):
-        return pos in self.eligible_moves(board)
-
-    def update_position(self, new_pos):
-        self.row, self.col = new_pos
-        self.update_board_position(new_pos)
-        return
+        return sliding_moves(self, board, directions)

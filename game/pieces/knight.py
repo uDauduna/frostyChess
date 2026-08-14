@@ -1,57 +1,33 @@
-from ..ui.sprite import Piece
+from .piece import Piece
+from ..rules import in_bounds, can_occupy
+
 
 class Knight(Piece):
-    def __init__(self, pos, color):
-        super().__init__("knight", color, pos)
-        self.row, self.col = pos
-        self.color = color
+    def __init__(self, color, position):
+        super().__init__("knight", color, position)
 
-    def safe_to_occupy(self, board, r, c):
-        if board.square_is_empty((r, c)):
-            return True
-        else:
-            if board.pieces[r][c].color != self.color:
-                return True
-        return False
+    def pseudo_legal_moves(self, board):
+        moves = []
 
-    def eligible_moves(self, board):
-        self.eligible = []
-        if self.in_bounds(self.row - 1, self.col - 2):
-            if self.safe_to_occupy(board, self.row - 1, self.col - 2):
-                self.eligible.append((self.row - 1, self.col - 2))
-        if self.in_bounds(self.row + 1, self.col - 2):
-            if self.safe_to_occupy(board, self.row + 1, self.col - 2):
-                self.eligible.append((self.row + 1, self.col -2))
-        if self.in_bounds(self.row - 2, self.col - 1):
-            if self.safe_to_occupy(board, self.row - 2, self.col - 1):
-                self.eligible.append((self.row - 2, self.col - 1))
-        if self.in_bounds(self.row + 2, self.col - 1):
-            if self.safe_to_occupy(board,self.row + 2, self.col - 1 ):
-                self.eligible.append((self.row + 2, self.col - 1))
-        if self.in_bounds(self.row - 1, self.col + 2):
-            if self.safe_to_occupy(board, self.row - 1, self.col + 2):
-                self.eligible.append((self.row - 1, self.col + 2))
-        if self.in_bounds(self.row - 2, self.col + 1):
-            if self.safe_to_occupy(board,self.row - 2, self.col + 1 ):
-                self.eligible.append((self.row - 2, self.col + 1))
-        if self.in_bounds(self.row + 1, self.col + 2 ):
-            if self.safe_to_occupy(board, self.row + 1, self.col + 2 ):
-                self.eligible.append((self.row + 1, self.col + 2))
-        if self.in_bounds(self.row + 2, self.col + 1):
-            if self.safe_to_occupy(board, self.row + 2, self.col + 1):
-                self.eligible.append((self.row + 2, self.col + 1))
-        return self.eligible
+        offsets = [
+            (-2, -1),
+            (-2, 1),
+            (-1, -2),
+            (-1, 2),
+            (1, -2),
+            (1, 2),
+            (2, -1),
+            (2, 1),
+        ]
 
-    def in_bounds(self, row, col):
-        if row >= 0 and row < 8:
-            if col < 8 and col >= 0:
-                return True
-        return False
+        for dr, dc in offsets:
+            row = self.row + dr
+            col = self.col + dc
 
-    def is_move_legal(self, pos, board):
-        return pos in self.eligible_moves(board)
+            if in_bounds(row, col):
+                position = (row, col)
 
-    def update_position(self, new_pos):
-        self.row, self.col = new_pos
-        self.update_board_position(new_pos)
-        return
+                if can_occupy(self, board, position):
+                    moves.append(position)
+
+        return moves
