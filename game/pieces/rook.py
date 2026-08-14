@@ -13,5 +13,4 @@ class Rook(Piece):
             (0, -1),
             (0, 1),
         ]
-
         return sliding_moves(self, board, directions)
