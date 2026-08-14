@@ -159,3 +159,68 @@ frostyChess/
     ├── test_rook.py
     ├── test_queen.py
     └── test_king.py
+
+
+                        ┌───────────────┐
+                    │    main.py    │
+                    │ UI/controller │
+                    └───────┬───────┘
+                            │
+                 ┌──────────┴──────────┐
+                 ▼                     ▼
+          ┌─────────────┐       ┌─────────────┐
+          │  Renderer   │       │ PromotionUI │
+          └──────┬──────┘       └─────────────┘
+                 │
+                 ▼
+          ┌─────────────┐
+          │ PieceSprite │
+          └─────────────┘
+
+
+          ┌─────────────────┐
+          │   ChessGame     │
+          ├─────────────────┤
+          │ turn            │
+          │ move_history    │
+          │ promotion      │
+          └────────┬────────┘
+                   │
+                   ▼
+             ┌──────────┐
+             │  Board   │
+             └────┬─────┘
+                  │
+        ┌─────────┴──────────┐
+        ▼                    ▼
+     Pieces                Rules
+
+
+Pygame
+   │
+   ▼
+UI
+   │
+   ▼
+ChessGame
+   │
+   ▼
+Board
+   │
+   ▼
+Pieces
+
+Not implemented yet
+
+* Legal move filtering
+* King cannot move into check
+* Pin detection
+* Checkmate
+* Stalemate
+* Castling
+* En passant
+* Undo
+* Redo
+* FEN
+* PGN
+* AI
