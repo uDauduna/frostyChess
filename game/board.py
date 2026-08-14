@@ -1,109 +1,91 @@
-from .pieces.pawn import Pawn
-from .pieces.knight import Knight
-from .pieces.bishop import Bishop
-from .pieces.rook import Rook
-from .pieces.king import King
-from .pieces.queen import Queen
-import pygame
+from .constants import BOARD_SIZE
+from .pieces import (Pawn, Knight, Bishop, Rook,Queen, King)
 
 
 class Board:
-    def __init__(self, clock=False):
-        self.board_state = [["r", "n", "b", "q", "k", "b", "n", "r"],
-                            ["p", "p", "p", "p", "p", "p", "p", "p"],
-                            [".", ".", ".", ".", ".", ".", ".", "."],
-                            [".", ".", ".", ".", ".", ".", ".", "."],
-                            [".", ".", ".", ".", ".", ".", ".", "."],
-                            [".", ".", ".", ".", ".", ".", ".", "."],
-                            ["P", "P", "P", "P", "P", "P", "P", "P"],
-                            ["R", "N", "B", "Q", "K", "B", "N", "R"],
-                            ]
+    def __init__(self):
+        self.pieces = [
+            [None for _ in range(BOARD_SIZE)]
+            for _ in range(BOARD_SIZE)
+        ]
+        self.initialize_pieces()
 
-        self.ranks = {0:8,
-                      1:7,
-                      2:6,
-                      3:5,
-                      4:4,
-                      5:3,
-                      6:2,
-                      7:1,
-                      }
-        
-        self.files = {0:"a",
-                      1:"b",
-                      2:"c",
-                      3:"d",
-                      4:"e",
-                      5:"f",
-                      6:"g",
-                      7:"h",
-                      }
-        self.pieces = [[".", ".", ".", ".", ".", ".", ".", "."],
-                      [".", ".", ".", ".", ".", ".", ".", "."],
-                      [".", ".", ".", ".", ".", ".", ".", "."],
-                      [".", ".", ".", ".", ".", ".", ".", "."],
-                      [".", ".", ".", ".", ".", ".", ".", "."],
-                      [".", ".", ".", ".", ".", ".", ".", "."],
-                      [".", ".", ".", ".", ".", ".", ".", "."],
-                      [".", ".", ".", ".", ".", ".", ".", "."],
-                      ]
-        self.piece_group = pygame.sprite.Group()
-        self.initialize_Pieces()
-        self.black_in_check = False
-        self.white_in_check = False
-        self.clock = clock
-        self.promotion = False
+    def initialize_pieces(self):
+        # Black pieces
+        self.pieces[0] = [
+            Rook("black", (0, 0)),
+            Knight("black", (0, 1)),
+            Bishop("black", (0, 2)),
+            Queen("black", (0, 3)),
+            King("black", (0, 4)),
+            Bishop("black", (0, 5)),
+            Knight("black", (0, 6)),
+            Rook("black", (0, 7)),
+        ]
 
+        self.pieces[1] = [
+            Pawn("black", (1, col))
+            for col in range(BOARD_SIZE)
+        ]
 
-    def initialize_Pieces(self):
-        for row in range(len(self.board_state)):
-            for col in range(len(self.board_state)):
-                piece_type = self.board_state[row][col]
-                if piece_type != ".":
-                    color = "black" if piece_type.islower() else "white"
-                    if piece_type.lower() == "p":
-                        piece = Pawn((row, col), color)
-                    elif piece_type.lower() == "r":
-                        piece = Rook((row, col), color)
-                    elif piece_type.lower() == "n":
-                        piece = Knight((row, col), color)
-                    elif piece_type.lower() == "b":
-                        piece = Bishop((row, col), color)
-                    elif piece_type.lower() == "k":
-                        piece = King((row, col), color)
-                    elif piece_type.lower() == "q":
-                        piece = Queen((row, col), color)
-                    self.pieces[row][col] = piece
-                    self.piece_group.add(piece)
-        return
+        # White pieces
+        self.pieces[6] = [
+            Pawn("white", (6, col))
+            for col in range(BOARD_SIZE)
+        ]
 
+        self.pieces[7] = [
+            Rook("white", (7, 0)),
+            Knight("white", (7, 1)),
+            Bishop("white", (7, 2)),
+            Queen("white", (7, 3)),
+            King("white", (7, 4)),
+            Bishop("white", (7, 5)),
+            Knight("white", (7, 6)),
+            Rook("white", (7, 7)),
+        ]
 
-    def get_board(self):
-        """
-        Return either the FEN or PGN 
-        """
-        return
+    def get_piece(self, position):
+        row, col = position
+        return self.pieces[row][col]
 
-    def square_is_empty(self, pos):
-        if self.board_state[pos[0]][pos[1]] == ".":
-            return True
-        return False
+    def set_piece(self, position, piece):
+        row, col = position
+        self.pieces[row][col] = piece
 
-    def promote_piece(self, pawn, promoted_piece):
-        pieces = {
-            "q": Queen,
-            "r": Rook,
-            "b": Bishop,
-            "n": Knight,
-        }
-        new_piece = pieces[promoted_piece.lower()]((pawn.row, pawn.col),pawn.color)
-        pawn.kill()
-        self.pieces[pawn.row][pawn.col] = new_piece
-        self.board_state[pawn.row][pawn.col] = promoted_piece
-        self.piece_group.add(new_piece)
+    def remove_piece(self, position):
+        row, col = position
+        piece = self.pieces[row][col]
+        self.pieces[row][col] = None
+        return piece
 
-    def timer(self):
-        """
-        To be implemented
-        """
-        return
+    def is_empty(self, position):
+        return self.get_piece(position) is None
+
+    def move_piece(self, start, end):
+        piece = self.remove_piece(start)
+        if piece is None:
+            return None
+        captured_piece = self.remove_piece(end)
+        piece.move_to(end)
+        self.set_piece(end, piece)
+        return captured_piece
+
+    def pieces_of_color(self, color):
+        result = []
+        for row in self.pieces:
+            for piece in row:
+                if piece is not None and piece.color == color:
+                    result.append(piece)
+        return result
+
+    def find_king(self, color):
+        for row in self.pieces:
+            for piece in row:
+                if (
+                    piece is not None
+                    and piece.color == color
+                    and piece.piece_type == "king"
+                ):
+                    return piece
+        return None
