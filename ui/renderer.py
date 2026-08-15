@@ -2,7 +2,6 @@ import pygame
 
 from .sprite import PieceSprite
 
-
 class Renderer:
     BOARD_X = 320
     BOARD_Y = 40
@@ -57,6 +56,20 @@ class Renderer:
         row, col = position
         pygame.draw.rect(
             self.board_surface,
+            (0, 0, 255),
+            (
+                col * self.SQUARE_SIZE,
+                row * self.SQUARE_SIZE,
+                self.SQUARE_SIZE,
+                self.SQUARE_SIZE,
+            ),
+            width=40,
+        )
+
+    def draw_legal_moves(self, moves):
+        for row, col in moves:
+            pygame.draw.rect(
+            self.board_surface,
             (50, 205, 50),
             (
                 col * self.SQUARE_SIZE,
@@ -64,22 +77,8 @@ class Renderer:
                 self.SQUARE_SIZE,
                 self.SQUARE_SIZE,
             ),
-            width=4,
+            width=40,
         )
-
-    def draw_legal_moves(self, moves):
-        radius = 10
-
-        for row, col in moves:
-            center_x = (col * self.SQUARE_SIZE + self.SQUARE_SIZE // 2 )
-            center_y = (row * self.SQUARE_SIZE + self.SQUARE_SIZE // 2 )
-
-            pygame.draw.circle(
-                self.board_surface,
-                (50, 200, 50),
-                (center_x, center_y),
-                radius,
-            )
 
     def draw(self, selected_position=None, legal_moves=None):
         self.board_surface.fill("white")
