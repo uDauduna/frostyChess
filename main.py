@@ -95,7 +95,7 @@ class Game:
         legal_moves = []
         if self.selected_square is not None:
             legal_moves = (
-                self.chess_game.pseudo_legal_moves(self.selected_square))
+                self.chess_game.legal_moves(self.selected_square))
         self.screen.fill(self.BACKGROUND_COLOR)
         if self.promotion_ui.active:
             self.renderer.draw()
