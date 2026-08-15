@@ -82,10 +82,6 @@ class Board:
     def find_king(self, color):
         for row in self.pieces:
             for piece in row:
-                if (
-                    piece is not None
-                    and piece.color == color
-                    and piece.piece_type == "king"
-                ):
+                if (piece is not None and piece.color == color and piece.piece_type == "king"):
                     return piece
         return None
