@@ -2,7 +2,7 @@ from .board import Board
 from .move import Move
 from .rules import is_in_check
 from .pieces import (Queen, Rook, Bishop, Knight)
-
+import copy
 
 class ChessGame:
     def __init__(self):
@@ -32,22 +32,41 @@ class ChessGame:
             return []
         return piece.pseudo_legal_moves(self.board)
 
+    def legal_moves(self, start):
+        piece = self.board.get_piece(start)
+        if piece is None:
+            return []
+        if piece.color != self.turn:
+            return []
+        pseudo_legal_moves = piece.pseudo_legal_moves(self.board)
+        legal_moves = []
+        for end in pseudo_legal_moves:
+            if self.is_move_legal(start, end):
+                legal_moves.append(end)
+        return legal_moves
+
+    def is_move_legal(self, start, end):
+        temp_board = copy.deepcopy(self.board)
+        temp_board.move_piece(start, end)
+        if is_in_check(temp_board, self.turn):
+            return False
+        return True
+
     def make_move(self, start, end):
         piece = self.board.get_piece(start)
         if piece is None:
             return False
         if piece.color != self.turn:
             return False
-        moves = piece.pseudo_legal_moves(self.board)
+        moves = self.legal_moves(start)
         if end not in moves:
             return False
         captured_piece = self.board.move_piece(start, end)
         move = Move(start=start,end=end,piece=piece,captured_piece=captured_piece)
         self.move_history.append(move)
-        if piece.piece_type == "pawn":
-            if self.is_promotion_rank(piece):
-                self.promotion_pending = piece
-                return True
+        if piece.piece_type == "pawn" and self.is_promotion_rank(piece):
+            self.promotion_pending = piece
+            return True
         self.switch_turn()
         return True
 
