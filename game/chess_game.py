@@ -103,3 +103,42 @@ class ChessGame:
 
     def current_player_in_check(self):
         return self.is_in_check(self.turn)
+
+    def has_legal_moves(self, color=None):
+        if color is None:
+            color = self.turn
+        pieces = self.board.pieces_of_color(color)
+        for piece in pieces:
+            if self.legal_moves(piece.position):
+                return True
+        return False
+
+    def is_checkmate(self, color=None):
+        if color is None:
+            color = self.turn
+        if not self.is_in_check(color):
+            return False
+        return not self.has_legal_moves(color)
+
+    def is_stalemate(self, color=None):
+        if color is None:
+            color = self.turn
+        if self.is_in_check(color):
+            return False
+        return not self.has_legal_moves(color)
+
+    def is_threefold_repetition(self):
+        return False
+
+    def is_insufficient_material(self):
+        return False
+
+    def is_draw(self):
+        return (self.is_stalemate() or self.is_insufficient_material() or self.is_threefold_repetition() or self.is_fifty_move_draw())
+
+    def game_in_progress(self):
+        if self.is_checkmate():
+            return False
+        if self.is_draw():
+            return False
+        return True
