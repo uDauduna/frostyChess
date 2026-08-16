@@ -105,6 +105,12 @@ class Game:
 
     def run(self):
         while self.running:
+            if not self.chess_game.game_in_progress():
+                self.running = False
+                """
+                Display results screen and menu
+                """
+                break
             self.handle_events()
             self.render()
             self.clock.tick(60)
