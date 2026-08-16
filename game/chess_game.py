@@ -131,6 +131,11 @@ class ChessGame:
         return False
 
     def is_insufficient_material(self):
+        if (len(self.board.pieces_of_color("black")) == 1 and len(self.board.pieces_of_color("white")) == 1):
+            return True
+        return False
+
+    def is_fifty_move_draw(self):
         return False
 
     def is_draw(self):
