@@ -136,7 +136,9 @@ class ChessGame:
         return False
 
     def is_fifty_move_draw(self):
-        return False
+        if len(self.move_history) < 100:
+            return False
+        return not any(move.resets_fifty_move_counter for move in self.move_history[-100:])
 
     def is_draw(self):
         return (self.is_stalemate() or self.is_insufficient_material() or self.is_threefold_repetition() or self.is_fifty_move_draw())
