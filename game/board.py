@@ -45,6 +45,23 @@ class Board:
             Rook("white", (7, 7)),
         ]
 
+    def get_position_state(self):
+        symbols = {
+            ("white", "pawn"): "P",
+            ("white", "knight"): "N",
+            ("white", "bishop"): "B",
+            ("white", "rook"): "R",
+            ("white", "queen"): "Q",
+            ("white", "king"): "K",
+            ("black", "pawn"): "p",
+            ("black", "knight"): "n",
+            ("black", "bishop"): "b",
+            ("black", "rook"): "r",
+            ("black", "queen"): "q",
+            ("black", "king"): "k",
+        }
+        return tuple(tuple("." if not piece else symbols[(piece.color, piece.piece_type)] for piece in row) for row in self.pieces)
+
     def get_piece(self, position):
         row, col = position
         return self.pieces[row][col]
