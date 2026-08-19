@@ -1,8 +1,9 @@
 from .board import Board
 from .move import Move
-from .rules import is_in_check
+from .rules import is_in_check, threefold_repetition
 from .pieces import (Queen, Rook, Bishop, Knight)
 import copy
+from .position import Position
 
 class ChessGame:
     def __init__(self):
@@ -17,12 +18,34 @@ class ChessGame:
             "black_queenside": True,
         }
         self.promotion_pending = None
+        self.position_history = []
+        self.record_position()
 
+    def get_position(self):
+        castling_rights = (
+        self.castling_rights["white_kingside"],
+        self.castling_rights["white_queenside"],
+        self.castling_rights["black_kingside"],
+        self.castling_rights["black_queenside"],
+    )
+        return Position(
+            board=self.board.get_position_state(),
+            turn=self.turn,
+            castling_rights=castling_rights,
+            en_passant_square=self.en_passant_target,
+        )
+
+    def record_position(self):
+        position = self.get_position()
+        self.position_history.append(position)
+        return
+        
     def switch_turn(self):
         if self.turn == "white":
             self.turn = "black"
         else:
             self.turn = "white"
+        return
 
     def pseudo_legal_moves(self, position):
         piece = self.board.get_piece(position)
@@ -68,6 +91,7 @@ class ChessGame:
             self.promotion_pending = piece
             return True
         self.switch_turn()
+        self.record_position()
         return True
 
     def promote(self, piece_type):
@@ -128,7 +152,8 @@ class ChessGame:
         return not self.has_legal_moves(color)
 
     def is_threefold_repetition(self):
-        return False
+        return threefold_repetition(self.position_history)
+
 
     def is_insufficient_material(self):
         if (len(self.board.pieces_of_color("black")) == 1 and len(self.board.pieces_of_color("white")) == 1):
