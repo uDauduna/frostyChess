@@ -58,3 +58,9 @@ def is_in_check(board, color):
     opponent = "black" if color == "white" else "white"
 
     return is_square_attacked(board, king.position,opponent)
+
+def threefold_repetition(position_history):
+    if not position_history:
+        return False
+    current_position = position_history[-1]
+    return position_history.count(current_position) >= 3
