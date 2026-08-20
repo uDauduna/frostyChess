@@ -115,53 +115,53 @@ class ChessGame:
             return self.castling_rights[f"{piece.color}_kingside"]
         return self.castling_rights[f"{piece.color}_queenside"]
 
-    # def is_en_passant_move(self, source, target):
-    #     if self.en_passant_target is None:
-    #         return False
-    #     if target != self.en_passant_target:
-    #         return False
-    #     piece = self.board.get_piece(source)
-    #     if piece is None:
-    #         return False
-    #     if piece.piece_type != "pawn":
-    #         return False
-    #     if piece.color != self.turn:
-    #         return False
-    #     if abs(target[1] - source[1]) != 1:
-    #         return False
-    #     if abs(target[0] - source[0]) != 1:
-    #         return False
-    #     captured_position = (source[0], target[1])
-    #     captured_piece = self.board.get_piece(captured_position)
-    #     if captured_piece is None:
-    #         return False
-    #     if captured_piece.piece_type != "pawn":
-    #         return False
-    #     if captured_piece.color == piece.color:
-    #         return False
-    #     return True
+    def is_en_passant_move(self, source, target):
+        if self.en_passant_target is None:
+            return False
+        if target != self.en_passant_target:
+            return False
+        piece = self.board.get_piece(source)
+        if piece is None:
+            return False
+        if piece.piece_type != "pawn":
+            return False
+        if piece.color != self.turn:
+            return False
+        if abs(target[1] - source[1]) != 1:
+            return False
+        if abs(target[0] - source[0]) != 1:
+            return False
+        captured_position = (source[0], target[1])
+        captured_piece = self.board.get_piece(captured_position)
+        if captured_piece is None:
+            return False
+        if captured_piece.piece_type != "pawn":
+            return False
+        if captured_piece.color == piece.color:
+            return False
+        return True
 
-    # def perform_en_passant(self, start, end):
-    #     pawn = self.board.get_piece(start)
-    #     captured_position = (start[0], end[1])
-    #     captured_piece = self.board.get_piece(captured_position)
-    #     if pawn is None or captured_piece is None:
-    #         return None
-    #     self.board.pieces[captured_position[0]][captured_position[1]] = None
-    #     self.board.pieces[start[0]][start[1]] = None
-    #     pawn.row = end[0]
-    #     pawn.col = end[1]
-    #     self.board.pieces[end[0]][end[1]] = pawn
-    #     return captured_piece
+    def perform_en_passant(self, start, end):
+        pawn = self.board.get_piece(start)
+        captured_position = (start[0], end[1])
+        captured_piece = self.board.get_piece(captured_position)
+        if pawn is None or captured_piece is None:
+            return None
+        self.board.pieces[captured_position[0]][captured_position[1]] = None
+        self.board.pieces[start[0]][start[1]] = None
+        pawn.row = end[0]
+        pawn.col = end[1]
+        self.board.pieces[end[0]][end[1]] = pawn
+        return captured_piece
 
-    # def update_en_passant_target(self, start, end, piece):
-    #     self.en_passant_target = None
-    #     if piece.piece_type != "pawn":
-    #         return
-    #     if abs(end[0] - start[0]) == 2:
-    #         middle_row = (start[0] + end[0]) // 2
-    #         self.en_passant_target = (middle_row, start[1])
-    #     return
+    def update_en_passant_target(self, start, end, piece):
+        self.en_passant_target = None
+        if piece.piece_type != "pawn":
+            return
+        if abs(end[0] - start[0]) == 2:
+            middle_row = (start[0] + end[0]) // 2
+            self.en_passant_target = (middle_row, start[1])
+        return
 
     # def update_castling_rights(self, piece, start, captured_piece, end):
     #     color = piece.color
