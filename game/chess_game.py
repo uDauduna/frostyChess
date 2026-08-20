@@ -21,13 +21,183 @@ class ChessGame:
         self.position_history = []
         self.record_position()
 
+    def is_square_attacked(self, square, by_color):
+        target_row, target_col = square
+        for row in range(8):
+            for col in range(8):
+                piece = self.board.pieces[row][col]
+                if piece is None:
+                    continue
+                if piece.color != by_color:
+                    continue
+                if piece.piece_type == "pawn":
+                    direction = -1 if piece.color == "white" else 1
+                    if target_row == row + direction and abs(target_col - col) == 1:
+                        return True
+                else:
+                    if square in piece.pseudo_legal_moves(self.board):
+                        return True
+        return False
+
+    def opposite_color(self, color):
+        if color == "white":
+            return "black"
+        return "white"
+
+    # def perform_castling(self, start, end):
+    #     king = self.board.get_piece(start)
+    #     row, king_col = start
+    #     _, target_col = end
+    #     if target_col > king_col:
+    #         rook_start = (row, 7)
+    #         rook_end = (row, 5)
+    #     else:
+    #         rook_start = (row, 0)
+    #         rook_end = (row, 3)
+    #     rook = self.board.get_piece(rook_start)
+    #     self.board.pieces[row][king_col] = None
+    #     king.row = end[0]
+    #     king.col = end[1]
+    #     self.board.pieces[end[0]][end[1]] = king
+    #     self.board.pieces[rook_start[0]][rook_start[1]] = None
+    #     rook.row = rook_end[0]
+    #     rook.col = rook_end[1]
+    #     self.board.pieces[rook_end[0]][rook_end[1]] = rook
+    #     return rook
+
+    # def can_castle(self, start, end):
+    #     if not self.is_castling_move(start, end):
+    #         return False
+    #     king = self.board.get_piece(start)
+    #     row, col = start
+    #     _, target_col = end
+    #     kingside = target_col > col
+    #     if kingside:
+    #         rook_col = 7
+    #         empty_columns = [5, 6]
+    #         king_path = [(row, 5), (row, 6)]
+    #     else:
+    #         rook_col = 0
+    #         empty_columns = [1, 2, 3]
+    #         king_path = [(row, 3), (row, 2)]
+    #     rook = self.board.get_piece((row, rook_col))
+    #     if rook is None:
+    #         return False
+    #     if rook.piece_type != "rook":
+    #         return False
+    #     if rook.color != king.color:
+    #         return False
+    #     for column in empty_columns:
+    #         if self.board.get_piece((row, column)) is not None:
+    #             return False
+    #     if self.is_square_attacked(start, self.opposite_color(king.color)):
+    #         return False
+    #     for square in king_path:
+    #         if self.is_square_attacked(square, self.opposite_color(king.color)):
+    #             return False
+    #     return True
+
+    # def is_castling_move(self, start, end):
+    #     piece = self.board.get_piece(start)
+    #     if piece is None:
+    #         return False
+    #     if piece.piece_type != "king":
+    #         return False
+    #     if piece.color != self.turn:
+    #         return False
+    #     row, col = start
+    #     target_row, target_col = end
+    #     if row != target_row:
+    #         return False
+    #     if abs(target_col - col) != 2:
+    #         return False
+    #     if target_col > col:
+    #         return self.castling_rights[f"{piece.color}_kingside"]
+    #     return self.castling_rights[f"{piece.color}_queenside"]
+
+    # def is_en_passant_move(self, source, target):
+    #     if self.en_passant_target is None:
+    #         return False
+    #     if target != self.en_passant_target:
+    #         return False
+    #     piece = self.board.get_piece(source)
+    #     if piece is None:
+    #         return False
+    #     if piece.piece_type != "pawn":
+    #         return False
+    #     if piece.color != self.turn:
+    #         return False
+    #     if abs(target[1] - source[1]) != 1:
+    #         return False
+    #     if abs(target[0] - source[0]) != 1:
+    #         return False
+    #     captured_position = (source[0], target[1])
+    #     captured_piece = self.board.get_piece(captured_position)
+    #     if captured_piece is None:
+    #         return False
+    #     if captured_piece.piece_type != "pawn":
+    #         return False
+    #     if captured_piece.color == piece.color:
+    #         return False
+    #     return True
+
+    # def perform_en_passant(self, start, end):
+    #     pawn = self.board.get_piece(start)
+    #     captured_position = (start[0], end[1])
+    #     captured_piece = self.board.get_piece(captured_position)
+    #     if pawn is None or captured_piece is None:
+    #         return None
+    #     self.board.pieces[captured_position[0]][captured_position[1]] = None
+    #     self.board.pieces[start[0]][start[1]] = None
+    #     pawn.row = end[0]
+    #     pawn.col = end[1]
+    #     self.board.pieces[end[0]][end[1]] = pawn
+    #     return captured_piece
+
+    # def update_en_passant_target(self, start, end, piece):
+    #     self.en_passant_target = None
+    #     if piece.piece_type != "pawn":
+    #         return
+    #     if abs(end[0] - start[0]) == 2:
+    #         middle_row = (start[0] + end[0]) // 2
+    #         self.en_passant_target = (middle_row, start[1])
+    #     return
+
+    # def update_castling_rights(self, piece, start, captured_piece, end):
+    #     color = piece.color
+    #     if piece.piece_type == "king":
+    #         self.castling_rights[f"{color}_kingside"] = False
+    #         self.castling_rights[f"{color}_queenside"] = False
+    #     elif piece.piece_type == "rook":
+    #         if color == "white":
+    #             if start == (7, 0):
+    #                 self.castling_rights["white_queenside"] = False
+    #             elif start == (7, 7):
+    #                 self.castling_rights["white_kingside"] = False
+    #         else:
+    #             if start == (0, 0):
+    #                 self.castling_rights["black_queenside"] = False
+    #             elif start == (0, 7):
+    #                 self.castling_rights["black_kingside"] = False
+    #     if captured_piece is not None and captured_piece.piece_type == "rook":
+    #         if captured_piece.color == "white":
+    #             if end == (7, 0):
+    #                 self.castling_rights["white_queenside"] = False
+    #             elif end == (7, 7):
+    #                 self.castling_rights["white_kingside"] = False
+    #         else:
+    #             if end == (0, 0):
+    #                 self.castling_rights["black_queenside"] = False
+    #             elif end == (0, 7):
+    #                 self.castling_rights["black_kingside"] = False
+
     def get_position(self):
         castling_rights = (
-        self.castling_rights["white_kingside"],
-        self.castling_rights["white_queenside"],
-        self.castling_rights["black_kingside"],
-        self.castling_rights["black_queenside"],
-    )
+            self.castling_rights["white_kingside"],
+            self.castling_rights["white_queenside"],
+            self.castling_rights["black_kingside"],
+            self.castling_rights["black_queenside"],
+        )
         return Position(
             board=self.board.get_position_state(),
             turn=self.turn,
@@ -39,7 +209,7 @@ class ChessGame:
         position = self.get_position()
         self.position_history.append(position)
         return
-        
+
     def switch_turn(self):
         if self.turn == "white":
             self.turn = "black"
@@ -53,7 +223,19 @@ class ChessGame:
             return []
         if piece.color != self.turn:
             return []
-        return piece.pseudo_legal_moves(self.board)
+        moves = piece.pseudo_legal_moves(self.board)
+        if piece.piece_type == "pawn":
+            if self.en_passant_target is not None and self.is_en_passant_move(position, self.en_passant_target):
+                moves.append(self.en_passant_target)
+        if piece.piece_type == "king":
+            row, col = position
+            kingside_target = (row, col + 2)
+            queenside_target = (row, col - 2)
+            if self.can_castle(position, kingside_target):
+                moves.append(kingside_target)
+            if self.can_castle(position, queenside_target):
+                moves.append(queenside_target)
+        return moves
 
     def legal_moves(self, start):
         piece = self.board.get_piece(start)
@@ -61,7 +243,7 @@ class ChessGame:
             return []
         if piece.color != self.turn:
             return []
-        pseudo_legal_moves = piece.pseudo_legal_moves(self.board)
+        pseudo_legal_moves = self.pseudo_legal_moves(start)
         legal_moves = []
         for end in pseudo_legal_moves:
             if self.is_move_legal(start, end):
@@ -69,11 +251,19 @@ class ChessGame:
         return legal_moves
 
     def is_move_legal(self, start, end):
-        temp_board = copy.deepcopy(self.board)
-        temp_board.move_piece(start, end)
-        if is_in_check(temp_board, self.turn):
+        temp_game = copy.deepcopy(self)
+        piece = temp_game.board.get_piece(start)
+        if piece is None:
             return False
-        return True
+        if temp_game.is_en_passant_move(start, end):
+            temp_game.perform_en_passant(start, end)
+        elif temp_game.is_castling_move(start, end):
+            if not temp_game.can_castle(start, end):
+                return False
+            temp_game.perform_castling(start, end)
+        else:
+            temp_game.board.move_piece(start, end)
+        return not is_in_check(temp_game.board, self.turn)
 
     def make_move(self, start, end):
         piece = self.board.get_piece(start)
@@ -81,38 +271,38 @@ class ChessGame:
             return False
         if piece.color != self.turn:
             return False
-        moves = self.legal_moves(start)
-        if end not in moves:
+        legal_moves = self.legal_moves(start)
+        if end not in legal_moves:
             return False
-        captured_piece = self.board.move_piece(start, end)
-        move = Move(start=start,end=end,piece=piece,captured_piece=captured_piece)
+        previous_en_passant_target = self.en_passant_target
+        previous_castling_rights = self.castling_rights.copy()
+        is_en_passant = self.is_en_passant_move(start, end)
+        is_castling = self.is_castling_move(start, end)
+        if is_en_passant:
+            captured_piece = self.perform_en_passant(start, end)
+        elif is_castling:
+            captured_piece = None
+            self.perform_castling(start, end)
+        else:
+            captured_piece = self.board.move_piece(start, end)
+        self.update_castling_rights(piece, start, captured_piece, end)
+        self.update_en_passant_target(start, end, piece)
+        move = Move(
+            start=start,
+            end=end,
+            piece=piece,
+            captured_piece=captured_piece,
+            is_castling=is_castling,
+            is_en_passant=is_en_passant,
+            previous_en_passant_target=previous_en_passant_target,
+            previous_castling_rights=previous_castling_rights
+        )
         self.move_history.append(move)
         if piece.piece_type == "pawn" and self.is_promotion_rank(piece):
             self.promotion_pending = piece
             return True
         self.switch_turn()
         self.record_position()
-        return True
-
-    def promote(self, piece_type):
-        if self.promotion_pending is None:
-            return False
-        pawn = self.promotion_pending
-        position = pawn.position
-        pieces = {
-            "q": Queen,
-            "r": Rook,
-            "b": Bishop,
-            "n": Knight,
-        }
-        piece_class = pieces.get(piece_type.lower())
-        if piece_class is None:
-            return False
-        new_piece = piece_class(pawn.color, position)
-        self.board.set_piece(position, new_piece)
-        self.move_history[-1].promotion = piece_type.lower()
-        self.promotion_pending = None
-        self.switch_turn()
         return True
 
     def is_promotion_rank(self, pawn):
@@ -131,10 +321,14 @@ class ChessGame:
     def has_legal_moves(self, color=None):
         if color is None:
             color = self.turn
+        previous_turn = self.turn
+        self.turn = color
         pieces = self.board.pieces_of_color(color)
         for piece in pieces:
             if self.legal_moves(piece.position):
+                self.turn = previous_turn
                 return True
+        self.turn = previous_turn
         return False
 
     def is_checkmate(self, color=None):
@@ -154,9 +348,8 @@ class ChessGame:
     def is_threefold_repetition(self):
         return threefold_repetition(self.position_history)
 
-
     def is_insufficient_material(self):
-        if (len(self.board.pieces_of_color("black")) == 1 and len(self.board.pieces_of_color("white")) == 1):
+        if len(self.board.pieces_of_color("black")) == 1 and len(self.board.pieces_of_color("white")) == 1:
             return True
         return False
 
