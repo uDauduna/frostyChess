@@ -44,76 +44,76 @@ class ChessGame:
             return "black"
         return "white"
 
-    # def perform_castling(self, start, end):
-    #     king = self.board.get_piece(start)
-    #     row, king_col = start
-    #     _, target_col = end
-    #     if target_col > king_col:
-    #         rook_start = (row, 7)
-    #         rook_end = (row, 5)
-    #     else:
-    #         rook_start = (row, 0)
-    #         rook_end = (row, 3)
-    #     rook = self.board.get_piece(rook_start)
-    #     self.board.pieces[row][king_col] = None
-    #     king.row = end[0]
-    #     king.col = end[1]
-    #     self.board.pieces[end[0]][end[1]] = king
-    #     self.board.pieces[rook_start[0]][rook_start[1]] = None
-    #     rook.row = rook_end[0]
-    #     rook.col = rook_end[1]
-    #     self.board.pieces[rook_end[0]][rook_end[1]] = rook
-    #     return rook
+    def perform_castling(self, start, end):
+        king = self.board.get_piece(start)
+        row, king_col = start
+        _, target_col = end
+        if target_col > king_col:
+            rook_start = (row, 7)
+            rook_end = (row, 5)
+        else:
+            rook_start = (row, 0)
+            rook_end = (row, 3)
+        rook = self.board.get_piece(rook_start)
+        self.board.pieces[row][king_col] = None
+        king.row = end[0]
+        king.col = end[1]
+        self.board.pieces[end[0]][end[1]] = king
+        self.board.pieces[rook_start[0]][rook_start[1]] = None
+        rook.row = rook_end[0]
+        rook.col = rook_end[1]
+        self.board.pieces[rook_end[0]][rook_end[1]] = rook
+        return rook
 
-    # def can_castle(self, start, end):
-    #     if not self.is_castling_move(start, end):
-    #         return False
-    #     king = self.board.get_piece(start)
-    #     row, col = start
-    #     _, target_col = end
-    #     kingside = target_col > col
-    #     if kingside:
-    #         rook_col = 7
-    #         empty_columns = [5, 6]
-    #         king_path = [(row, 5), (row, 6)]
-    #     else:
-    #         rook_col = 0
-    #         empty_columns = [1, 2, 3]
-    #         king_path = [(row, 3), (row, 2)]
-    #     rook = self.board.get_piece((row, rook_col))
-    #     if rook is None:
-    #         return False
-    #     if rook.piece_type != "rook":
-    #         return False
-    #     if rook.color != king.color:
-    #         return False
-    #     for column in empty_columns:
-    #         if self.board.get_piece((row, column)) is not None:
-    #             return False
-    #     if self.is_square_attacked(start, self.opposite_color(king.color)):
-    #         return False
-    #     for square in king_path:
-    #         if self.is_square_attacked(square, self.opposite_color(king.color)):
-    #             return False
-    #     return True
+    def can_castle(self, start, end):
+        if not self.is_castling_move(start, end):
+            return False
+        king = self.board.get_piece(start)
+        row, col = start
+        _, target_col = end
+        kingside = target_col > col
+        if kingside:
+            rook_col = 7
+            empty_columns = [5, 6]
+            king_path = [(row, 5), (row, 6)]
+        else:
+            rook_col = 0
+            empty_columns = [1, 2, 3]
+            king_path = [(row, 3), (row, 2)]
+        rook = self.board.get_piece((row, rook_col))
+        if rook is None:
+            return False
+        if rook.piece_type != "rook":
+            return False
+        if rook.color != king.color:
+            return False
+        for column in empty_columns:
+            if self.board.get_piece((row, column)) is not None:
+                return False
+        if self.is_square_attacked(start, self.opposite_color(king.color)):
+            return False
+        for square in king_path:
+            if self.is_square_attacked(square, self.opposite_color(king.color)):
+                return False
+        return True
 
-    # def is_castling_move(self, start, end):
-    #     piece = self.board.get_piece(start)
-    #     if piece is None:
-    #         return False
-    #     if piece.piece_type != "king":
-    #         return False
-    #     if piece.color != self.turn:
-    #         return False
-    #     row, col = start
-    #     target_row, target_col = end
-    #     if row != target_row:
-    #         return False
-    #     if abs(target_col - col) != 2:
-    #         return False
-    #     if target_col > col:
-    #         return self.castling_rights[f"{piece.color}_kingside"]
-    #     return self.castling_rights[f"{piece.color}_queenside"]
+    def is_castling_move(self, start, end):
+        piece = self.board.get_piece(start)
+        if piece is None:
+            return False
+        if piece.piece_type != "king":
+            return False
+        if piece.color != self.turn:
+            return False
+        row, col = start
+        target_row, target_col = end
+        if row != target_row:
+            return False
+        if abs(target_col - col) != 2:
+            return False
+        if target_col > col:
+            return self.castling_rights[f"{piece.color}_kingside"]
+        return self.castling_rights[f"{piece.color}_queenside"]
 
     # def is_en_passant_move(self, source, target):
     #     if self.en_passant_target is None:
