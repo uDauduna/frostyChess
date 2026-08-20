@@ -163,33 +163,33 @@ class ChessGame:
             self.en_passant_target = (middle_row, start[1])
         return
 
-    # def update_castling_rights(self, piece, start, captured_piece, end):
-    #     color = piece.color
-    #     if piece.piece_type == "king":
-    #         self.castling_rights[f"{color}_kingside"] = False
-    #         self.castling_rights[f"{color}_queenside"] = False
-    #     elif piece.piece_type == "rook":
-    #         if color == "white":
-    #             if start == (7, 0):
-    #                 self.castling_rights["white_queenside"] = False
-    #             elif start == (7, 7):
-    #                 self.castling_rights["white_kingside"] = False
-    #         else:
-    #             if start == (0, 0):
-    #                 self.castling_rights["black_queenside"] = False
-    #             elif start == (0, 7):
-    #                 self.castling_rights["black_kingside"] = False
-    #     if captured_piece is not None and captured_piece.piece_type == "rook":
-    #         if captured_piece.color == "white":
-    #             if end == (7, 0):
-    #                 self.castling_rights["white_queenside"] = False
-    #             elif end == (7, 7):
-    #                 self.castling_rights["white_kingside"] = False
-    #         else:
-    #             if end == (0, 0):
-    #                 self.castling_rights["black_queenside"] = False
-    #             elif end == (0, 7):
-    #                 self.castling_rights["black_kingside"] = False
+    def update_castling_rights(self, piece, start, captured_piece, end):
+        color = piece.color
+        if piece.piece_type == "king":
+            self.castling_rights[f"{color}_kingside"] = False
+            self.castling_rights[f"{color}_queenside"] = False
+        elif piece.piece_type == "rook":
+            if color == "white":
+                if start == (7, 0):
+                    self.castling_rights["white_queenside"] = False
+                elif start == (7, 7):
+                    self.castling_rights["white_kingside"] = False
+            else:
+                if start == (0, 0):
+                    self.castling_rights["black_queenside"] = False
+                elif start == (0, 7):
+                    self.castling_rights["black_kingside"] = False
+        if captured_piece is not None and captured_piece.piece_type == "rook":
+            if captured_piece.color == "white":
+                if end == (7, 0):
+                    self.castling_rights["white_queenside"] = False
+                elif end == (7, 7):
+                    self.castling_rights["white_kingside"] = False
+            else:
+                if end == (0, 0):
+                    self.castling_rights["black_queenside"] = False
+                elif end == (0, 7):
+                    self.castling_rights["black_kingside"] = False
 
     def get_position(self):
         castling_rights = (
