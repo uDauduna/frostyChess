@@ -97,10 +97,10 @@ class Game:
             legal_moves = (self.chess_game.legal_moves(self.selected_square))
         self.screen.fill(self.BACKGROUND_COLOR)
         if self.promotion_ui.active:
-            self.renderer.draw()
+            self.renderer.draw(self.chess_game.pieces_captured_by_black, self.chess_game.pieces_captured_by_white)
             self.promotion_ui.draw(self.screen)
         else:
-            self.renderer.draw(selected_position=self.selected_square,legal_moves=legal_moves)
+            self.renderer.draw(self.chess_game.pieces_captured_by_black, self.chess_game.pieces_captured_by_white,selected_position=self.selected_square,legal_moves=legal_moves)
         pygame.display.flip()
 
     def run(self):
