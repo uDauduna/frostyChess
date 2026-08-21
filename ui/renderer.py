@@ -1,6 +1,7 @@
 import pygame
 
 from .sprite import PieceSprite
+from .player_dashboard import PlayerPanel
 
 class Renderer:
     BOARD_X = 320
@@ -9,12 +10,12 @@ class Renderer:
     SQUARE_SIZE = 80
     DARK_SQUARE = (181, 136, 99)
     LIGHT_SQUARE = (240, 217, 181)
+
     def __init__(self, screen, chess_game):
         self.screen = screen
         self.game = chess_game
-        self.board_surface = pygame.Surface(
-            (self.BOARD_SIZE, self.BOARD_SIZE)
-        )
+        self.board_surface = pygame.Surface((self.BOARD_SIZE, self.BOARD_SIZE))
+        self.player_panel = PlayerPanel()
         self.sprites = {}
 
     def sync_pieces(self):
@@ -80,7 +81,7 @@ class Renderer:
             width=40,
         )
 
-    def draw(self, selected_position=None, legal_moves=None):
+    def draw(self, pieces_captured_by_black, pieces_captured_by_white, selected_position=None, legal_moves=None, black_time=None, white_time=None, dt=0):
         self.board_surface.fill("white")
         self.draw_board()
         if selected_position is not None:
@@ -88,9 +89,7 @@ class Renderer:
         if legal_moves:
             self.draw_legal_moves(legal_moves)
         self.sync_pieces()
-        self.screen.blit(
-            self.board_surface,
-            (self.BOARD_X, self.BOARD_Y),
-        )
+        self.screen.blit(self.board_surface,(self.BOARD_X,self.BOARD_Y))
         for sprite in self.sprites.values():
-            self.screen.blit(sprite.image, sprite.rect)
+            self.screen.blit(sprite.image,sprite.rect)
+        self.player_panel.draw(self.screen,pieces_captured_by_black, pieces_captured_by_white,black_time,white_time,self.game.turn,dt)
