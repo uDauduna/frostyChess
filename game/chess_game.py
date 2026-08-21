@@ -20,6 +20,16 @@ class ChessGame:
         self.promotion_pending = None
         self.position_history = []
         self.record_position()
+        self.pieces_captured_by_black = []
+        self.pieces_captured_by_white = []
+        self.piece_values = {
+                            "pawn": 1,
+                            "knight": 3,
+                            "bishop": 3,
+                            "rook": 5,
+                            "queen": 9,
+                            "king": 0
+                        }
 
     def is_square_attacked(self, square, by_color):
         target_row, target_col = square
@@ -285,6 +295,9 @@ class ChessGame:
             self.perform_castling(start, end)
         else:
             captured_piece = self.board.move_piece(start, end)
+        self.store_captured_pieces(captured_piece)
+        print(captured_piece,self.pieces_captured_by_black, self.pieces_captured_by_white)
+            
         self.update_castling_rights(piece, start, captured_piece, end)
         self.update_en_passant_target(start, end, piece)
         move = Move(
@@ -304,6 +317,17 @@ class ChessGame:
         self.switch_turn()
         self.record_position()
         return True
+
+    def store_captured_pieces(self, piece):
+        if piece is None:
+            return
+        if piece.color == "black":
+            self.pieces_captured_by_white.append((piece.piece_type, self.piece_values[piece.piece_type]))
+            self.pieces_captured_by_white.sort(key = lambda x: -x[1])
+        else:
+            self.pieces_captured_by_black.append((piece.piece_type, self.piece_values[piece.piece_type]))
+            self.pieces_captured_by_black.sort(key = lambda x: -x[1])
+        return
 
     def is_promotion_rank(self, pawn):
         if pawn.color == "white":
