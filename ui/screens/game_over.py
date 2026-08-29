@@ -15,13 +15,10 @@ class GameOver(BaseScreen):
         self.result_font = pygame.font.Font(None, 50)
         self.button_font = pygame.font.Font(None, 34)
         self.result = "GAME OVER"
-
         center_x = self.width // 2
-
         self.new_game_button = Button((center_x - 150, 400, 300, 60), "PLAY NEW GAME", self.button_font, self.new_game)
         self.menu_button = Button((center_x - 150, 480, 300, 60), "MAIN MENU", self.button_font, self.main_menu)
         self.quit_button = Button((center_x - 150, 560, 300, 60), "QUIT", self.button_font, self.quit)
-
         self.buttons = [self.new_game_button, self.menu_button, self.quit_button]
         return
 
