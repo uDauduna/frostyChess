@@ -108,7 +108,7 @@ class Game:
             if not self.chess_game.game_in_progress():
                 self.running = False
                 """
-                Display results screen and menu
+                hand over control to screen manager
                 """
                 break
             self.handle_events()
