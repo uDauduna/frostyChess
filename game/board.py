@@ -102,3 +102,8 @@ class Board:
                 if (piece is not None and piece.color == color and piece.piece_type == "king"):
                     return piece
         return None
+    @classmethod
+    def from_fen(cls, fen):
+        from .chess_game import ChessGame
+        game = ChessGame.from_fen(fen)
+        return game.board
