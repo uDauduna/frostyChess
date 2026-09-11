@@ -1,11 +1,12 @@
 import pygame
-
+import os
 
 class PromotionUI:
     def __init__(self):
         self.active = False
         self.color = None
         self.choice_rects = {}
+        self.asset_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets")
 
     def open(self, pawn):
         self.active = True
@@ -18,10 +19,7 @@ class PromotionUI:
 
     def get_image(self, piece_type):
         prefix = "b" if self.color == "black" else "w"
-        path = (
-            f"./assets/"
-            f"{prefix}-{piece_type}.png"
-        )
+        path = os.path.join(self.asset_dir, f"{prefix}-{piece_type}.png")
         image = pygame.image.load(path).convert_alpha()
         width = int(image.get_width() * 0.125)
         height = int(image.get_height() * 0.125)
@@ -31,27 +29,14 @@ class PromotionUI:
         overlay = pygame.Surface(screen.get_size(),pygame.SRCALPHA,)
         overlay.fill((0, 0, 0, 150))
         screen.blit(overlay, (0, 0))
-        panel = pygame.Rect(
-            screen.get_width() // 2 - 150,
-            screen.get_height() // 2 - 150,
-            300,
-            300,
-        )
-
-        pygame.draw.rect(
-            screen,
-            (45, 45, 45),
-            panel,
-            border_radius=12,
-        )
-
+        panel = pygame.Rect(screen.get_width() // 2 - 150,screen.get_height() // 2 - 150,300,300,)
+        pygame.draw.rect(screen,(45, 45, 45),panel,border_radius=12,)
         pieces = [
             ("q", "queen"),
             ("r", "rook"),
             ("b", "bishop"),
             ("n", "knight"),
         ]
-
         positions = [
             (panel.centerx - 60, panel.centery - 60),
             (panel.centerx + 60, panel.centery - 60),
