@@ -39,8 +39,8 @@ class ScreenManager:
         self.active_screen = self.game_setup
         return
 
-    def start_game(self, color, difficulty):
-        self.game_screen = GameScreen(self.screen, self, color, difficulty)
+    def start_game(self, color, difficulty, mode="casual"):
+        self.game_screen = GameScreen(self.screen, self, color, difficulty, mode)
         self.current_screen = Screen.PLAYING
         self.active_screen = self.game_screen
         return
