@@ -1,150 +1,42 @@
+import os
 import pygame
 
 class PlayerPanel:
+    PANEL_COLOR = (32, 38, 46)
+    TEXT = (235, 235, 235)
+    MUTED = (155, 165, 175)
+
     def __init__(self):
-        self.pieces_captured_by_black = []
-        self.pieces_captured_by_white = []
-        self.hourglass_frames = []
-        self.hourglass_frame_count = 15
-        self.white_hourglass_frame = 0
-        self.black_hourglass_frame = 0
-        self.white_hourglass_time = 0
-        self.black_hourglass_time = 0
-        self.hourglass_speed = 0.08
-        self.load_hourglass()
-        self.PANEL_COLOR = (190, 220, 204)
-
-    def black_pieces(self, piece):
-        self.pieces_captured_by_black.append(piece)
-
-    def white_pieces(self, piece):
-        self.pieces_captured_by_white.append(piece)
+        self.asset_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets")
+        self.font = pygame.font.Font(None, 30)
+        self.small = pygame.font.Font(None, 22)
 
     def get_image(self, piece_type, color):
         prefix = "b" if color == "black" else "w"
-        path = f"./assets/{prefix}-{piece_type}.png"
-        image = pygame.image.load(path).convert_alpha()
-        width = int(image.get_width() * 0.125)
-        height = int(image.get_height() * 0.125)
-        return pygame.transform.scale(image,(width, height),)
+        image = pygame.image.load(os.path.join(self.asset_dir, f"{prefix}-{piece_type}.png")).convert_alpha()
+        scale = min(.07, 42/max(image.get_width(), image.get_height()))
+        return pygame.transform.smoothscale(image, (int(image.get_width()*scale), int(image.get_height()*scale)))
 
-    def load_hourglass(self):
-        sheet = pygame.image.load("./assets/hourglass.png").convert_alpha()
-        frame_width = sheet.get_width() // self.hourglass_frame_count
-        frame_height = sheet.get_height()
-        for index in range(self.hourglass_frame_count):
-            frame = sheet.subsurface((index * frame_width,0,frame_width,frame_height)).copy()
-            width = int(frame.get_width() * 0.5)
-            height = int(frame.get_height() * 0.5)
-            frame = pygame.transform.scale(frame,(width,height))
-            self.hourglass_frames.append(frame)
+    def draw(self, screen, captured_black, captured_white, black_time=None, white_time=None, turn=None, dt=0):
+        w,h=screen.get_size()
+        left=pygame.Rect(0,0,250,h); right=pygame.Rect(w-250,0,250,h)
+        pygame.draw.rect(screen,self.PANEL_COLOR,left); pygame.draw.rect(screen,self.PANEL_COLOR,right)
+        self._player(screen,left,"BLACK",captured_white,black_time,turn=="black")
+        self._player(screen,right,"WHITE",captured_black,white_time,turn=="white")
 
-    def update_hourglass(self, color, active, dt):
-        if not active:
-            return
-        if color == "white":
-            self.white_hourglass_time += dt
-            if self.white_hourglass_time >= self.hourglass_speed:
-                self.white_hourglass_time = 0
-                self.white_hourglass_frame = (self.white_hourglass_frame + 1) % len(self.hourglass_frames)
-        else:
-            self.black_hourglass_time += dt
-            if self.black_hourglass_time >= self.hourglass_speed:
-                self.black_hourglass_time = 0
-                self.black_hourglass_frame = (self.black_hourglass_frame + 1) % len(self.hourglass_frames)
-
-    def draw_hourglass(self, screen, panel, color, active):
-        if len(self.hourglass_frames) == 0:
-            return
-        if color == "white":
-            image = self.hourglass_frames[self.white_hourglass_frame]
-        else:
-            image = self.hourglass_frames[self.black_hourglass_frame]
-        image = image.copy()
-        rect = image.get_rect()
-        rect.centerx = panel.centerx
-        rect.bottom = screen.get_height() - 120
-        if not active:
-            image.set_alpha(100)
-        else:
-            image.set_alpha(255)
-        screen.blit(image,rect)
-
-    def draw_captured_pieces(self, screen,pieces_captured_by_black, pieces_captured_by_white):
-        black_panel = pygame.Rect(0,0,250,screen.get_height())
-        white_panel = pygame.Rect(screen.get_width() - 250,0,250,screen.get_height())
-        pygame.draw.rect(screen,self.PANEL_COLOR,black_panel)
-        pygame.draw.rect(screen,self.PANEL_COLOR,white_panel)
-        self.draw_spoil_header(screen,white_panel,"white")
-        self.draw_spoil_header(screen,black_panel,"black")
-        self.draw_piece_list(screen,pieces_captured_by_white,white_panel,"black")
-        self.draw_piece_list(screen,pieces_captured_by_black,black_panel,"white")
-
-    def draw_spoil_header(self, screen, panel, color):
-        king = self.get_image("king",color)
-        king_rect = king.get_rect()
-        king_rect.centerx = panel.centerx
-        king_rect.top = 15
-        screen.blit(king,king_rect)
-        font = pygame.font.Font(None,32)
-        title = font.render(f"{color.capitalize()}'s Spoil",True,(255,255,255))
-        title_rect = title.get_rect()
-        title_rect.centerx = panel.centerx
-        title_rect.top = king_rect.bottom + 5
-        screen.blit(title,title_rect)
-
-    def draw_piece_list(self, screen, pieces, panel, color):
-        x = panel.left + 20
-        y = 90
-        spacing = 45
-        for index, piece in enumerate(pieces):
-            piece_type = piece[0]
-            image = self.get_image(piece_type,color)
-            rect = image.get_rect()
-            rect.topleft = (x + (index % 4) * spacing,y + (index // 4) * spacing)
-            screen.blit(image,rect)
-
-    def draw_timer(self, screen, panel, time_left, active):
-        font = pygame.font.Font(None,48)
-        minutes = int(time_left // 60)
-        seconds = int(time_left % 60)
-        text = f"{minutes:02d}:{seconds:02d}"
-        if active:
-            timer = font.render(text,True,(255,255,255))
-        else:
-            timer = font.render(text,True,(150,150,150))
-        rect = timer.get_rect()
-        rect.centerx = panel.centerx
-        rect.bottom = screen.get_height() - 70
-        screen.blit(timer,rect)
-
-    def draw_turn(self, screen, panel, color):
-        font = pygame.font.Font(None,30)
-        if color == "black":
-            text = "Black's Turn"
-        else:
-            text = "White's Turn"
-        turn = font.render(text,True,(255,255,255))
-        rect = turn.get_rect()
-        rect.centerx = panel.centerx
-        rect.bottom = screen.get_height() - 30
-        screen.blit(turn,rect)
-
-    def draw(self,screen, pieces_captured_by_black, pieces_captured_by_white,black_time=None, white_time=None, turn=None, dt=0):
-        self.draw_captured_pieces(screen, pieces_captured_by_black, pieces_captured_by_white)
-        black_panel = pygame.Rect(0,0,250,screen.get_height())
-        white_panel = pygame.Rect(screen.get_width() - 250,0,250,screen.get_height())
-        self.update_hourglass("black",turn == "black",dt)
-        self.update_hourglass("white",turn == "white",dt)
-        self.draw_hourglass(screen,black_panel,"black",turn == "black")
-        self.draw_hourglass(screen,white_panel,"white",turn == "white")
-        if black_time is not None:
-            self.draw_timer(screen,black_panel,black_time,turn == "black")
-        if white_time is not None:
-            self.draw_timer(screen,white_panel,white_time,turn == "white")
-        if turn is not None:
-            if turn == "black":
-                self.draw_turn(screen,black_panel,"black")
-            else:
-                self.draw_turn(screen,white_panel,"white")
-    
+    def _player(self,screen,panel,name,captured,time_left,active):
+        y=35
+        label=self.font.render(name,True,self.TEXT)
+        screen.blit(label,label.get_rect(centerx=panel.centerx,top=y)); y+=45
+        status="YOUR TURN" if active else "WAITING"
+        screen.blit(self.small.render(status,True,self.TEXT if active else self.MUTED),
+                    (panel.left+25,y)); y+=35
+        if time_left is not None:
+            mins=int(time_left//60); secs=int(time_left%60)
+            timer=self.font.render(f"{mins:02d}:{secs:02d}",True,self.TEXT)
+            screen.blit(timer,timer.get_rect(centerx=panel.centerx,top=y)); y+=50
+        screen.blit(self.small.render("Captured",True,self.MUTED),(panel.left+25,y)); y+=28
+        for i,(ptype,_) in enumerate(captured):
+            image=self.get_image(ptype,"black" if name=="WHITE" else "white")
+            x=panel.left+20+(i%4)*48; yy=y+(i//4)*48
+            screen.blit(image,image.get_rect(center=(x+20,yy+20)))
