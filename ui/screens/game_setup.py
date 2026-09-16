@@ -24,14 +24,30 @@ class GameSetup(BaseScreen):
         self.buttons=[self.white_button,self.black_button,self.easy_button,self.medium_button,self.hard_button,
                       self.casual_button,self.competitive_button,self.start_button,self.back_button]
 
-    def select_color(self,v): self.selected_color=v
-    def select_difficulty(self,v): self.selected_difficulty=v
-    def select_mode(self,v): self.selected_mode=v
-    def start_game(self): self.screen_manager.start_game(self.selected_color,self.selected_difficulty,self.selected_mode)
-    def go_back(self): self.screen_manager.show_main_menu()
+    def select_color(self,v): 
+        self.selected_color=v
+
+    def select_difficulty(self,v): 
+        self.selected_difficulty=v
+
+    def select_mode(self,v): 
+        self.selected_mode=v
+
+    def start_game(self): 
+        self.screen_manager.start_game(self.selected_color,self.selected_difficulty,self.selected_mode)
+
+
+    def go_back(self): 
+        self.screen_manager.show_main_menu()
+
+
     def handle_event(self,event):
-        for b in self.buttons: b.handle_event(event)
-    def update(self): pass
+        for b in self.buttons: 
+            b.handle_event(event)
+
+    def update(self): 
+        pass
+
     def draw(self):
         self.screen.fill((24,29,35))
         title=self.title_font.render("NEW GAME",True,(240,240,240))
