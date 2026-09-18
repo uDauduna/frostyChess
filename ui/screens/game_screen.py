@@ -97,16 +97,32 @@ class GameScreen(BaseScreen):
                 self.screen_manager.show_game_over(result)
 
     def draw(self):
-        self.screen.fill((24,29,35))
-        self.renderer.draw(self.game.pieces_captured_by_black,self.game.pieces_captured_by_white,
-                           self.selected_square,
-                           self.game.legal_moves(self.selected_square) if self.selected_square else [])
-        title=pygame.font.Font(None,34).render(
+        self.screen.fill((18, 25, 32))
+        self.renderer.draw(
+            self.game.pieces_captured_by_black,
+            self.game.pieces_captured_by_white,
+            self.selected_square,
+            self.game.legal_moves(self.selected_square) if self.selected_square else [],)
+        status_rect = pygame.Rect(270, 5, 500, 42)
+        pygame.draw.rect(self.screen, (34, 43, 53), status_rect, border_radius=8)
+        pygame.draw.rect(self.screen, (105, 118, 128), status_rect, width=1, border_radius=8)
+
+        title_font = pygame.font.Font(None, 30)
+        title = title_font.render(
             f"{self.mode.upper()}  •  {self.player_color.upper()}  •  {self.difficulty.upper()}",
-            True,(235,235,235))
-        self.screen.blit(title,(285,10))
-        hint=pygame.font.Font(None,22).render("F: flip board   U: undo (casual)   ESC: pause",True,(150,160,170))
-        self.screen.blit(hint,(300,690))
+            True,
+            (235, 235, 235),
+        )
+        title_rect = title.get_rect(center=status_rect.center)
+        self.screen.blit(title, title_rect)
+        hint_font = pygame.font.Font(None, 22)
+        controls = ["[F] FLIP BOARD", "[U] UNDO", "[ESC] PAUSE"]
+        x = 300
+
+        for text in controls:
+            surface = hint_font.render(text, True, (175, 190, 198))
+            self.screen.blit(surface, (x, 690))
+            x += surface.get_width() + 35
         for button in self.buttons:
             button.draw(self.screen)
         if self.promotion_ui.active:
