@@ -3,6 +3,8 @@ from .base_screen import BaseScreen
 from ui.components import Button
 from ui.theme import FrostyTheme
 import os
+from pathlib import Path
+
 
 class MainMenu(BaseScreen):
     def __init__(self, screen, screen_manager):
@@ -13,8 +15,8 @@ class MainMenu(BaseScreen):
         self.title_font = pygame.font.Font(None, 86)
         self.subtitle_font = pygame.font.Font(None, 26)
         self.font = pygame.font.Font(None, 34)
-        self.asset_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets")
-        path = os.path.join(self.asset_dir, "theme.png")
+        self.asset_dir = Path(__file__).resolve().parents[2] / "assets"
+        path = os.path.join(self.asset_dir, "theme.jpg")
         self.background_raw = pygame.image.load(path).convert()
         self.background = pygame.transform.scale(self.background_raw, (self.width, self.height))
         self.create_buttons()
