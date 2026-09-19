@@ -110,9 +110,6 @@ class Renderer:
             sprite.update_position(self.board_x,self.board_y,self.SQUARE_SIZE)
             self.screen.blit(sprite.image, sprite.rect)
 
-        # if a and a["elapsed"] >= a["duration"]:
-        #     self.animation = None
-
         self.player_panel.draw(self.screen, pieces_captured_by_black,
                                pieces_captured_by_white, black_time,
                                white_time, self.game.turn, dt)
