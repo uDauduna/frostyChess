@@ -5,5 +5,5 @@ from .promotion_ui import PromotionUI
 __all__ = [
     "Renderer",
     "PieceSprite",
-    "PromotionUI",
+    "PromotionUI"
 ]
