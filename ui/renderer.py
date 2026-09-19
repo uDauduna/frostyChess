@@ -106,23 +106,7 @@ class Renderer:
         self._draw_coordinates()
         self.sync_pieces()
 
-        # if self.animation:
-        #     a = self.animation
-        #     a["elapsed"] += dt
-        #     t = min(1.0, a["elapsed"]/a["duration"])
-        #     t = t*t*(3-2*t)
-        # else:
-        #     a = None
-
         for piece, sprite in self.sprites.items():
-            # if a and piece is a["piece"]:
-            #     sr, sc = self.square_center(a["start"])
-            #     er, ec = self.square_center(a["end"])
-            #     x = sr + (er-sr)*t
-            #     y = sc + (ec-sc)*t
-            #     sprite.rect = sprite.image.get_rect(center=(x,y))
-            # else:
-            #     sprite.update_position(self.board_x,self.board_y,self.SQUARE_SIZE)
             sprite.update_position(self.board_x,self.board_y,self.SQUARE_SIZE)
             self.screen.blit(sprite.image, sprite.rect)
 
