@@ -1,6 +1,7 @@
 import os
 import pygame
 
+
 class PieceSprite(pygame.sprite.Sprite):
     def __init__(self, piece, asset_dir=None):
         super().__init__()
@@ -14,14 +15,15 @@ class PieceSprite(pygame.sprite.Sprite):
         path = os.path.join(self.asset_dir, f"{prefix}-{self.piece.piece_type}.png")
         image = pygame.image.load(path).convert_alpha()
         scale = min(0.125, 74 / max(image.get_width(), image.get_height()))
-        return pygame.transform.smoothscale(image, (int(image.get_width()*scale), int(image.get_height()*scale)))
+        return pygame.transform.smoothscale(image, (int(image.get_width() * scale), int(image.get_height() * scale)))
 
     def board_rect(self, board_x, board_y, square_size, row, col):
         return self.image.get_rect(center=(
-            board_x + col*square_size + square_size//2,
-            board_y + row*square_size + square_size//2
+            board_x + col * square_size + square_size // 2,
+            board_y + row * square_size + square_size // 2,
         ))
 
     def update_position(self, board_x, board_y, square_size, row=None, col=None):
-        row, col = self.piece.position if row is None else (row, col)
+        if row is None or col is None:
+            row, col = self.piece.position
         self.rect = self.board_rect(board_x, board_y, square_size, row, col)
