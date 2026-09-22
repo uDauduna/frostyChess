@@ -57,8 +57,10 @@ def random_self_play(games):
             promotion="queen" if game.board.get_piece(start).piece_type=="pawn" and end[0] in (0,7) else None
             game.make_move(start,end,promotion)
             if game.promotion_pending: game.promote("queen")
-        if game.is_checkmate(): counts[game.opposite_color(game.turn)]+=1
-        else: counts["draw"]+=1
+        if game.is_checkmate(): 
+            counts[game.opposite_color(game.turn)]+=1
+        else: 
+            counts["draw"]+=1
     print(counts)
 
 if __name__=="__main__":
