@@ -19,6 +19,14 @@ class Button:
         self.hover_border = FrostyTheme.BORDER_HOVER
         self.selected_border = FrostyTheme.BORDER_SELECTED
         self.text_color = FrostyTheme.TEXT
+        self.shadow = self._create_shadow()
+        self._text_cache = {}
+
+    def _create_shadow(self):
+        surface = pygame.Surface((self.rect.width, self.rect.height + 4), pygame.SRCALPHA)
+        pygame.draw.rect(surface, (0, 0, 0, 70),
+                         (0, 4, self.rect.width, self.rect.height), border_radius=10)
+        return surface
 
     def set_selected(self, selected):
         self.selected = selected
@@ -37,39 +45,33 @@ class Button:
                 self.callback()
 
     def draw(self, screen):
-        # Determine colors based on state
         if not self.enabled:
             fill = FrostyTheme.DISABLED
             border = FrostyTheme.DISABLED
             text_color = FrostyTheme.DISABLED_TEXT
-
         elif self.selected:
             fill = self.selected_color
             border = self.selected_border
             text_color = FrostyTheme.TEXT
-
         elif self.hovered:
             fill = self.hover_color
             border = self.hover_border
             text_color = FrostyTheme.ICE_BRIGHT
-
         else:
             fill = self.normal_color
             border = self.normal_border
             text_color = self.text_color
 
-        # Shadow
         if self.enabled:
-            shadow_rect = self.rect.copy()
-            shadow_rect.y += 4
-            shadow_surface = pygame.Surface(shadow_rect.size, pygame.SRCALPHA)
-            pygame.draw.rect(shadow_surface, (0, 0, 0, 70), shadow_surface.get_rect(), border_radius=10)
-            screen.blit(shadow_surface, shadow_rect)
-        # Main button
+            screen.blit(self.shadow, self.rect.move(0, 0))
+
         pygame.draw.rect(screen, fill, self.rect, border_radius=10)
-        # Border
-        pygame.draw.rect(screen, border, self.rect, width=2 if self.selected or self.hovered else 1, border_radius=10)
-        # Text
-        text_surface = self.font.render(self.text, True, text_color)
-        text_rect = text_surface.get_rect(center=self.rect.center)
-        screen.blit(text_surface, text_rect)
+        border_width = 2 if self.selected or self.hovered else 1
+        pygame.draw.rect(screen, border, self.rect, width=border_width, border_radius=10)
+
+        cache_key = (self.text, text_color)
+        text_surface = self._text_cache.get(cache_key)
+        if text_surface is None:
+            text_surface = self.font.render(self.text, True, text_color)
+            self._text_cache[cache_key] = text_surface
+        screen.blit(text_surface, text_surface.get_rect(center=self.rect.center))
