@@ -1,3 +1,5 @@
+"""This module contains the game screen used by frostyChess."""
+
 import pygame
 
 from .base_screen import BaseScreen
@@ -21,7 +23,7 @@ class GameScreen(BaseScreen):
         self.selected_square = None
         self.selected_legal_moves = []
         self.last_result = None
-        self.checked_move_count = 0
+        self.checked_state = None
         font = pygame.font.Font(None, 28)
         self.title_font = pygame.font.Font(None, 30)
         self.hint_font = pygame.font.Font(None, 22)
@@ -39,7 +41,6 @@ class GameScreen(BaseScreen):
         if self.game.undo():
             self.selected_square = None
             self.selected_legal_moves = []
-            self.checked_move_count = len(self.game.move_history)
 
     def mouse_to_board(self, position):
         x, y = position
@@ -75,7 +76,6 @@ class GameScreen(BaseScreen):
         if piece and clicked in self.selected_legal_moves and self.game.make_move(start, clicked):
             self.renderer.start_move_animation(self.game.move_history[-1].piece, start, clicked)
             self.select_square(None)
-            self.checked_move_count = len(self.game.move_history)
             if self.game.promotion_pending:
                 self.promotion_ui.open(self.game.promotion_pending)
             return
@@ -110,24 +110,33 @@ class GameScreen(BaseScreen):
                 self.handle_board_click(event)
 
     def update(self):
-        if len(self.game.move_history) == self.checked_move_count:
+        """Check game-ending conditions only after a state change."""
+        state = (self.game.state_version, self.game.promotion_pending is not None)
+        if state == self.checked_state:
+            return
+        self.checked_state = state
+
+        # A promotion is not a completed turn until the player chooses a piece.
+        if self.game.promotion_pending is not None:
             return
 
-        self.checked_move_count = len(self.game.move_history)
-        if self.game.is_checkmate() or self.game.is_draw():
-            if self.game.is_checkmate():
-                result = "CHECKMATE — BLACK WINS" if self.game.turn == "white" else "CHECKMATE — WHITE WINS"
-            elif self.game.is_stalemate():
-                result = "DRAW — STALEMATE"
-            elif self.game.is_threefold_repetition():
-                result = "DRAW — THREEFOLD REPETITION"
-            elif self.game.is_fifty_move_draw():
-                result = "DRAW — 50-MOVE RULE"
-            else:
-                result = "DRAW — INSUFFICIENT MATERIAL"
-            if self.last_result != result:
-                self.last_result = result
-                self.screen_manager.show_game_over(result)
+        if not self.game.is_checkmate() and not self.game.is_draw():
+            return
+
+        if self.game.is_checkmate():
+            result = "CHECKMATE — BLACK WINS" if self.game.turn == "white" else "CHECKMATE — WHITE WINS"
+        elif self.game.is_stalemate():
+            result = "DRAW — STALEMATE"
+        elif self.game.is_threefold_repetition():
+            result = "DRAW — THREEFOLD REPETITION"
+        elif self.game.is_fifty_move_draw():
+            result = "DRAW — 50-MOVE RULE"
+        else:
+            result = "DRAW — INSUFFICIENT MATERIAL"
+
+        if self.last_result != result:
+            self.last_result = result
+            self.screen_manager.show_game_over(result)
 
     def draw(self):
         self.screen.fill((18, 25, 32))
