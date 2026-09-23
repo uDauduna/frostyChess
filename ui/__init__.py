@@ -1,3 +1,5 @@
+"""This module contains the   init   used by frostyChess."""
+
 from .renderer import Renderer
 from .sprite import PieceSprite
 from .promotion_ui import PromotionUI
