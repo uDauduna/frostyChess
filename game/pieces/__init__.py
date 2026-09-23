@@ -1,3 +1,5 @@
+"""This module contains the   init   used by frostyChess."""
+
 from .piece import Piece
 from .pawn import Pawn
 from .knight import Knight

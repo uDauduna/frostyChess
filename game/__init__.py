@@ -1,3 +1,5 @@
+"""This module contains the   init   used by frostyChess."""
+
 from .board import Board
 from .chess_game import ChessGame
 from .move import Move
