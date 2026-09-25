@@ -1,3 +1,5 @@
+"""This module contains the pawn used by frostyChess."""
+
 from .piece import Piece
 from ..rules import in_bounds
 
@@ -28,6 +30,7 @@ class Pawn(Piece):
 
     def attack_squares(self):
         return [(self.row + self.direction,self.col - 1),(self.row + self.direction,self.col + 1)]
+    
     def is_on_starting_rank(self):
         if self.color == "white":
             return self.row == 6
