@@ -1,3 +1,5 @@
+"""This module contains the screen manager used by frostyChess."""
+
 from enum import Enum
 
 from ui.screens.main_menu import MainMenu
