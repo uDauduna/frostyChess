@@ -1,3 +1,5 @@
+"""This module contains the move used by frostyChess."""
+
 from dataclasses import dataclass
 
 @dataclass

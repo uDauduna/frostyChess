@@ -1,3 +1,5 @@
+"""This module contains the constants used by frostyChess."""
+
 BOARD_SIZE = 8
 WHITE = "white"
 BLACK = "black"
