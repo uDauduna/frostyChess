@@ -1,3 +1,5 @@
+"""This module contains the game setup used by frostyChess."""
+
 import pygame
 
 from .base_screen import BaseScreen

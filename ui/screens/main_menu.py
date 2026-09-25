@@ -1,3 +1,5 @@
+"""This module contains the main menu used by frostyChess."""
+
 import os
 import random
 from pathlib import Path

@@ -1,3 +1,5 @@
+"""This module contains the game over used by frostyChess."""
+
 import pygame
 
 from .base_screen import BaseScreen
@@ -44,7 +46,7 @@ class GameOver(BaseScreen):
         return
 
     def update(self):
-        pass
+        self.draw()
         return
 
     def draw(self):

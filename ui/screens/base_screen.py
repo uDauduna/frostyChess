@@ -1,3 +1,5 @@
+"""This module contains the base screen used by frostyChess."""
+
 from abc import ABC, abstractmethod
 
 
