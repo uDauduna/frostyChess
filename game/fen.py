@@ -103,6 +103,7 @@ def load_fen(game, fen):
     game.fullmove_number = fullmove_i
     game.move_history = []
     game.position_history = []
+    game.position_counts = {}
     game.promotion_pending = None
     game.initial_fen = fen.strip()
     game.pieces_captured_by_black = []
