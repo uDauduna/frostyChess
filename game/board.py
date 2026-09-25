@@ -1,3 +1,5 @@
+"""This module contains the board used by frostyChess."""
+
 from .constants import BOARD_SIZE
 from .pieces import (Pawn, Knight, Bishop, Rook,Queen, King)
 

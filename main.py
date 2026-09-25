@@ -1,3 +1,5 @@
+"""This module contains the main used by frostyChess."""
+
 import pygame
 from ui.screen_manager import ScreenManager
 
