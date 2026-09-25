@@ -1,3 +1,5 @@
+"""This module contains the knight used by frostyChess."""
+
 from .piece import Piece
 from ..rules import in_bounds, can_occupy
 
