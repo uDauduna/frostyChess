@@ -1,3 +1,5 @@
+"""This module contains the theme used by frostyChess."""
+
 import pygame
 
 
