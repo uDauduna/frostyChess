@@ -1,3 +1,5 @@
+"""This module contains the sprite used by frostyChess."""
+
 import os
 import pygame
 
