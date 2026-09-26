@@ -1,3 +1,5 @@
+"""This module contains the promotion ui used by frostyChess."""
+
 import os
 import pygame
 
