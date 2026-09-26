@@ -17,7 +17,7 @@ python cli.py --random-games 100
 python cli.py --fen "8/8/8/8/8/8/4K3/4k2R w - - 0 1"
 ```
 
-## New architecture
+## Architecture
 
 - `game/` — engine/model only; safe to import from training code.
 - `game/fen.py` — FEN import/export.
@@ -68,3 +68,18 @@ simulation with a faster make/unmake representation.
 - `F` — flip board.
 - `U` — undo in Casual mode.
 - `Esc` — pause.
+
+## Performance notes
+
+The engine is designed to stay responsive as games become longer.
+
+- Legal move checks temporarily apply and undo moves on the existing board instead of deep-copying the complete game.
+- Attack detection checks the requested square directly and stops at the first attacker.
+- Threefold repetition uses a position-count dictionary instead of scanning the complete history.
+- User undo snapshots store board references and compact metadata rather than copying every previous move and position.
+- Piece sprites are synchronized only when the chess state changes, not every render frame.
+- Board coordinate text is cached instead of being rendered every frame.
+- Game-over checks run only after the game state changes.
+
+The AI, advanced options, and load-game features can be added later without requiring the rendering loop to rebuild the chess state.
+
