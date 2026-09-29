@@ -1,3 +1,5 @@
+"""This module contains the pause screen used by frostyChess."""
+
 import pygame
 
 from .base_screen import BaseScreen
