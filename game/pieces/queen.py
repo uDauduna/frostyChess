@@ -1,3 +1,5 @@
+"""This module contains the queen used by frostyChess."""
+
 from .piece import Piece
 from ..rules import sliding_moves
 
