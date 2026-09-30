@@ -1,3 +1,5 @@
+"""This module contains the components used by frostyChess."""
+
 import pygame
 from ui.theme import FrostyTheme
 
