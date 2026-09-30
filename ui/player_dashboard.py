@@ -1,3 +1,5 @@
+"""This module contains the player dashboard used by frostyChess."""
+
 import os
 import pygame
 
