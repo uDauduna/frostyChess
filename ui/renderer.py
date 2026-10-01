@@ -1,3 +1,5 @@
+"""This module contains the renderer used by frostyChess."""
+
 import pygame
 from .sprite import PieceSprite
 from .player_dashboard import PlayerPanel
@@ -23,7 +25,12 @@ class Renderer:
         self.player_panel = PlayerPanel()
         self.sprites = {}
         self.animation = None
+        # Piece sprites are synchronized only when the game board changes.
+        self._synced_state_version = -1
         self.coordinate_font = pygame.font.Font(None, 20)
+        # Coordinates never change except when the board is flipped, so cache
+        # their rendered surfaces rather than rendering text every frame.
+        self._coordinate_surfaces = {}
         self._draw_base_board()
 
     def _draw_base_board(self):
@@ -52,16 +59,23 @@ class Renderer:
         return (self.board_x + col * self.SQUARE_SIZE + 40, self.board_y + row * self.SQUARE_SIZE + 40)
 
     def sync_pieces(self):
-        current = []
+        """Create/remove sprites only when the board state has changed."""
+        if self._synced_state_version == self.game.state_version:
+            return
+
+        current = set()
         for row in self.game.board.pieces:
             for piece in row:
                 if piece is not None:
-                    current.append(piece)
+                    current.add(piece)
                     if piece not in self.sprites:
                         self.sprites[piece] = PieceSprite(piece)
-        for piece in list(self.sprites):
+
+        for piece in tuple(self.sprites):
             if piece not in current:
                 del self.sprites[piece]
+
+        self._synced_state_version = self.game.state_version
 
     def draw_board(self, selected=None, legal_moves=None):
         self.screen.blit(self.board_surface, (self.board_x, self.board_y))
@@ -91,16 +105,25 @@ class Renderer:
         self.animation = {"piece": piece, "start": start, "end": end, "elapsed": 0.0, "duration": duration}
 
     def _draw_coordinates(self):
+        """Draw cached file/rank labels for the current board orientation."""
         for display_col in range(8):
             row, col = self.model_square(7, display_col)
             file_label = "abcdefgh"[col]
-            surface = self.coordinate_font.render(file_label, True, (35, 35, 35))
+            key = ("file", file_label)
+            surface = self._coordinate_surfaces.get(key)
+            if surface is None:
+                surface = self.coordinate_font.render(file_label, True, (35, 35, 35))
+                self._coordinate_surfaces[key] = surface
             self.screen.blit(surface, (self.board_x + display_col * 80 + 67, self.board_y + 620))
 
         for display_row in range(8):
             row, col = self.model_square(display_row, 0)
             rank_label = str(8 - row)
-            surface = self.coordinate_font.render(rank_label, True, (35, 35, 35))
+            key = ("rank", rank_label)
+            surface = self._coordinate_surfaces.get(key)
+            if surface is None:
+                surface = self.coordinate_font.render(rank_label, True, (35, 35, 35))
+                self._coordinate_surfaces[key] = surface
             self.screen.blit(surface, (self.board_x + 5, self.board_y + display_row * 80 + 5))
 
     def draw(self, pieces_captured_by_black, pieces_captured_by_white, selected_position=None,
