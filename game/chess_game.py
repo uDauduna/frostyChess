@@ -3,11 +3,9 @@
 The UI is intentionally not coupled to this class.  This makes ChessGame suitable
 for Pygame, a CLI, self-play, search algorithms, and ML data generation.
 """
-import copy
-
 from .board import Board
 from .move import Move
-from .rules import is_in_check, threefold_repetition
+from .rules import is_in_check, is_square_attacked, threefold_repetition
 from .pieces import Queen, Rook, Bishop, Knight, Pawn, King
 from .position import Position
 from .fen import board_to_fen, load_fen
@@ -25,6 +23,8 @@ class ChessGame:
         self.move_history = []
         self.san_history = []
         self.position_history = []
+        # Count positions directly so threefold repetition is O(1).
+        self.position_counts = {}
         self.en_passant_target = None
         self.castling_rights = {
             "white_kingside": True, "white_queenside": True,
@@ -37,6 +37,8 @@ class ChessGame:
         self.pieces_captured_by_white = []
         self.piece_values = {"pawn": 1, "knight": 3, "bishop": 3, "rook": 5, "queen": 9, "king": 0}
         self._undo_stack = []
+        # Monotonically increases whenever the board-visible state changes.
+        self.state_version = 0
         if fen:
             load_fen(self, fen)
         else:
@@ -51,18 +53,18 @@ class ChessGame:
         return board_to_fen(self)
 
     def clone(self):
-        result = copy.deepcopy(self)
+        """Create an independent game for callers that explicitly need one.
+
+        This is intentionally not used during normal move validation.
+        """
+        from copy import deepcopy
+        result = deepcopy(self)
         result._undo_stack = []
         return result
 
     def is_square_attacked(self, square, by_color):
-        for piece in self.board.pieces_of_color(by_color):
-            if piece.piece_type == "pawn":
-                if square in piece.attack_squares():
-                    return True
-            elif square in piece.pseudo_legal_moves(self.board):
-                return True
-        return False
+        """Check one square using the optimized rules helper."""
+        return is_square_attacked(self.board, square, by_color)
 
     def opposite_color(self, color):
         return "black" if color == "white" else "white"
@@ -172,7 +174,10 @@ class ChessGame:
         )
 
     def record_position(self):
-        self.position_history.append(self.get_position())
+        """Record the current position and update its repetition count."""
+        position = self.get_position()
+        self.position_history.append(position)
+        self.position_counts[position] = self.position_counts.get(position, 0) + 1
 
     def switch_turn(self):
         self.turn = self.opposite_color(self.turn)
@@ -198,31 +203,125 @@ class ChessGame:
         return [end for end in self.pseudo_legal_moves(start) if self.is_move_legal(start, end)]
 
     def legal_move_pairs(self, color=None):
+        """Return all legal moves for a side without cloning the game."""
         original = self.turn
-        if color is not None: self.turn = color
+        if color is not None:
+            self.turn = color
         try:
-            return [(piece.position, end) for piece in self.board.pieces_of_color(self.turn)
-                    for end in self.legal_moves(piece.position)]
+            pairs = []
+            for piece in self.board.pieces_of_color(self.turn):
+                for end in self.legal_moves(piece.position):
+                    pairs.append((piece.position, end))
+            return pairs
         finally:
             self.turn = original
 
-    def is_move_legal(self, start, end):
-        temp = self.clone()
-        piece = temp.board.get_piece(start)
-        if piece is None: return False
-        if temp.is_en_passant_move(start, end):
-            temp.perform_en_passant(start, end)
-        elif temp.is_castling_move(start, end):
-            if not temp.can_castle(start, end): return False
-            temp.perform_castling(start, end)
+    def _temporary_move(self, start, end):
+        """Apply a move for validation and return the information needed to undo it."""
+        piece = self.board.get_piece(start)
+        captured = None
+        rook = None
+        rook_start = None
+        rook_end = None
+        en_passant_capture = None
+
+        if self.is_en_passant_move(start, end):
+            en_passant_capture = (start[0], end[1])
+            captured = self.board.get_piece(en_passant_capture)
+            self.board.remove_piece(en_passant_capture)
+            self.board.remove_piece(start)
+            piece.move_to(end)
+            self.board.set_piece(end, piece)
+        elif self.is_castling_move(start, end):
+            row, start_col = start
+            target_col = end[1]
+            rook_start = (row, 7) if target_col > start_col else (row, 0)
+            rook_end = (row, 5) if target_col > start_col else (row, 3)
+            rook = self.board.get_piece(rook_start)
+            self.board.remove_piece(start)
+            piece.move_to(end)
+            self.board.set_piece(end, piece)
+            self.board.remove_piece(rook_start)
+            rook.move_to(rook_end)
+            self.board.set_piece(rook_end, rook)
         else:
-            temp.board.move_piece(start, end)
-        return not is_in_check(temp.board, self.turn)
+            captured = self.board.move_piece(start, end)
+
+        return piece, captured, en_passant_capture, rook, rook_start, rook_end
+
+    def _undo_temporary_move(self, start, end, state):
+        """Restore a board after _temporary_move()."""
+        piece, captured, en_passant_capture, rook, rook_start, rook_end = state
+
+        if rook is not None:
+            self.board.remove_piece(end)
+            piece.move_to(start)
+            self.board.set_piece(start, piece)
+            self.board.remove_piece(rook_end)
+            rook.move_to(rook_start)
+            self.board.set_piece(rook_start, rook)
+            return
+
+        self.board.remove_piece(end)
+        piece.move_to(start)
+        self.board.set_piece(start, piece)
+
+        if en_passant_capture is not None:
+            self.board.set_piece(en_passant_capture, captured)
+        elif captured is not None:
+            self.board.set_piece(end, captured)
+
+    def is_move_legal(self, start, end):
+        """Check a move by making it in-place, checking the king, then undoing it."""
+        piece = self.board.get_piece(start)
+        if piece is None:
+            return False
+        if self.is_castling_move(start, end) and not self.can_castle(start, end):
+            return False
+
+        state = self._temporary_move(start, end)
+        try:
+            return not is_in_check(self.board, piece.color)
+        finally:
+            self._undo_temporary_move(start, end, state)
 
     def _save_undo_state(self):
-        snapshot = self.clone()
-        snapshot._undo_stack = []
-        self._undo_stack.append(snapshot)
+        """Save a compact, constant-size snapshot for user undo.
+
+        Older versions copied every move and every position into every undo
+        snapshot. That made memory usage grow quadratically during long games.
+        We now store only list lengths plus the board references and piece
+        coordinates needed to restore the previous state.
+        """
+        board_state = tuple(tuple(row) for row in self.board.pieces)
+        piece_positions = tuple(
+            (piece, piece.position)
+            for row in self.board.pieces
+            for piece in row
+            if piece is not None
+        )
+        self._undo_stack.append({
+            "board": board_state,
+            "piece_positions": piece_positions,
+            "turn": self.turn,
+            "en_passant_target": self.en_passant_target,
+            "castling_rights": self.castling_rights.copy(),
+            "halfmove_clock": self.halfmove_clock,
+            "fullmove_number": self.fullmove_number,
+            "move_history_len": len(self.move_history),
+            "san_history_len": len(self.san_history),
+            "position_history_len": len(self.position_history),
+            # Only the current position count can change during one move.
+            "last_position": self.position_history[-1] if self.position_history else None,
+            "last_position_count": (
+                self.position_counts.get(self.position_history[-1], 0)
+                if self.position_history else 0
+            ),
+            "promotion_pending": self.promotion_pending,
+            "captured_black_len": len(self.pieces_captured_by_black),
+            "captured_white_len": len(self.pieces_captured_by_white),
+            "state_version": self.state_version,
+        })
 
     def make_move(self, start, end, promotion=None):
         piece = self.board.get_piece(start)
@@ -262,6 +361,7 @@ class ChessGame:
         move = Move(start, end, piece, captured, promotion, is_castle, is_ep,
                     previous_ep, previous_castling, previous_halfmove, previous_fullmove)
         self.move_history.append(move)
+        self.state_version += 1
         if promotion:
             self._replace_promoted_pawn(end, promotion)
         if not finalize:
@@ -297,6 +397,7 @@ class ChessGame:
         self.switch_turn()
         self.record_position()
         self.promotion_pending = None
+        self.state_version += 1
         if self.san_history:
             base_san = self.san_history[-1].split("=")[0].rstrip("+#")
             self.san_history[-1] = base_san + "=" + {"queen":"Q","rook":"R","bishop":"B","knight":"N"}[piece_type]
@@ -314,11 +415,47 @@ class ChessGame:
         target.sort(key=lambda x: -x[1])
 
     def undo(self):
-        if not self._undo_stack: return False
-        snapshot = self._undo_stack.pop()
-        state_stack = self._undo_stack
-        self.__dict__ = snapshot.__dict__
-        self._undo_stack = state_stack
+        """Restore the most recent user-visible position."""
+        if not self._undo_stack:
+            return False
+
+        state = self._undo_stack.pop()
+        self.board.pieces = [list(row) for row in state["board"]]
+
+        for piece, position in state["piece_positions"]:
+            piece.move_to(position)
+
+        self.turn = state["turn"]
+        self.en_passant_target = state["en_passant_target"]
+        self.castling_rights = state["castling_rights"]
+        self.halfmove_clock = state["halfmove_clock"]
+        self.fullmove_number = state["fullmove_number"]
+
+        # Trim histories instead of copying/rebuilding them.
+        del self.move_history[state["move_history_len"]:]
+        del self.san_history[state["san_history_len"]:]
+
+        while len(self.position_history) > state["position_history_len"]:
+            removed = self.position_history.pop()
+            count = self.position_counts.get(removed, 0)
+            if count <= 1:
+                self.position_counts.pop(removed, None)
+            else:
+                self.position_counts[removed] = count - 1
+
+        # The compact snapshot keeps the previous position count available
+        # when the move did not append a position (for example, a pending
+        # promotion).
+        previous = state["last_position"]
+        previous_count = state["last_position_count"]
+        if previous is not None:
+            if previous_count:
+                self.position_counts[previous] = previous_count
+
+        del self.pieces_captured_by_black[state["captured_black_len"]:]
+        del self.pieces_captured_by_white[state["captured_white_len"]:]
+        self.promotion_pending = state["promotion_pending"]
+        self.state_version = state["state_version"] + 1
         return True
 
     def can_undo(self):
@@ -359,7 +496,7 @@ class ChessGame:
         return not self.is_in_check(color) and not self.has_legal_moves(color)
 
     def is_threefold_repetition(self):
-        return threefold_repetition(self.position_history)
+        return threefold_repetition(self.position_counts)
 
     def is_insufficient_material(self):
         pieces = [p for p in self.board.pieces_of_color("white") + self.board.pieces_of_color("black") if p.piece_type != "king"]
