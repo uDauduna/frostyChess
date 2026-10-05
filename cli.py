@@ -28,13 +28,19 @@ def interactive(fen=None):
     while game.game_in_progress():
         print_board(game)
         command=input(f"{game.turn}> ").strip()
-        if not command: continue
-        if command=="quit": return
-        if command=="fen": print(game.to_fen()); continue
+        if not command: 
+            continue
+        if command=="quit": 
+            return
+        if command=="fen": 
+            print(game.to_fen())
+            continue
         if command=="undo":
-            print("Undone." if game.undo() else "Nothing to undo."); continue
+            print("Undone." if game.undo() else "Nothing to undo.")
+            continue
         if command=="moves":
-            print(" ".join(square_name(a)+square_name(b) for a,b in game.legal_move_pairs())); continue
+            print(" ".join(square_name(a)+square_name(b) for a,b in game.legal_move_pairs()))
+            continue
         try:
             if not game.push_uci(command):
                 print("Illegal move.")
@@ -52,7 +58,8 @@ def random_self_play(games):
         game=ChessGame()
         while game.game_in_progress() and len(game.move_history)<400:
             moves=game.legal_move_pairs()
-            if not moves: break
+            if not moves: 
+                break
             start,end=random.choice(moves)
             promotion="queen" if game.board.get_piece(start).piece_type=="pawn" and end[0] in (0,7) else None
             game.make_move(start,end,promotion)
