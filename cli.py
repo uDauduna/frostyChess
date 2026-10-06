@@ -53,6 +53,53 @@ def interactive(fen=None):
     else:
         print("Draw.")
 
+def play_against_cpu(fen=None):
+    """
+    Play a game against the cpu
+    """
+    print("frostyChess CLI — enter UCI moves such as e2e4 or e7e8q.")
+    print("Commands: fen, undo, moves, quit")
+    game=ChessGame.from_fen(fen) if fen else ChessGame()
+    color = input("Enter Color: [W]hite or [B]lack: ")
+    cpu_player = 1 if color == "W" else 0
+    player = 0
+    print("Start")
+    while game.game_in_progress() and len(game.move_history)<400:
+        print_board(game)
+        moves=game.legal_move_pairs()
+        if not moves: 
+            break
+        start,end=random.choice(moves)
+        promotion="queen" if game.board.get_piece(start).piece_type=="pawn" and end[0] in (0,7) else None
+        game.make_move(start,end,promotion)
+        if game.promotion_pending: 
+            game.promote("queen")
+        
+        command=input(f"{game.turn}> ").strip()
+        if not command: 
+            continue
+        if command=="quit": 
+            return
+        if command=="fen": 
+            print(game.to_fen())
+            continue
+        if command=="undo":
+            print("Undone." if game.undo() else "Nothing to undo.")
+            continue
+        if command=="moves":
+            print(" ".join(square_name(a)+square_name(b) for a,b in game.legal_move_pairs()))
+            continue
+        try:
+            if not game.push_uci(command):
+                print("Illegal move.")
+        except ValueError as exc:
+            print(exc)
+    print_board(game)
+    if game.is_checkmate():
+        print(f"Checkmate — {game.opposite_color(game.turn)} wins.")
+    else:
+        print("Draw.")
+
 def random_self_play(games):
     counts={"white":0,"black":0,"draw":0}
     for _ in range(games):
@@ -70,8 +117,6 @@ def random_self_play(games):
         else: 
             counts["draw"]+=1
     print(counts)
-
-def play_against_cpu()
 
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
