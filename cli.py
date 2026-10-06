@@ -53,6 +53,19 @@ def interactive(fen=None):
     else:
         print("Draw.")
 
+def make_cpu_move(game):
+    moves=game.legal_move_pairs()
+    if moves: 
+        start,end=random.choice(moves)
+        promotion="queen" if game.board.get_piece(start).piece_type=="pawn" and end[0] in (0,7) else None
+        game.make_move(start,end,promotion)
+        if game.promotion_pending: 
+            game.promote("queen")
+    return
+
+def make_player_move(game):
+    pass
+        
 def play_against_cpu(fen=None):
     """
     Play a game against the cpu
@@ -64,17 +77,10 @@ def play_against_cpu(fen=None):
     cpu_player = 1 if color == "W" else 0
     player = 0
     print("Start")
+    if cpu_player == 0:
+        make_cpu_move(game)
     while game.game_in_progress() and len(game.move_history)<400:
         print_board(game)
-        moves=game.legal_move_pairs()
-        if not moves: 
-            break
-        start,end=random.choice(moves)
-        promotion="queen" if game.board.get_piece(start).piece_type=="pawn" and end[0] in (0,7) else None
-        game.make_move(start,end,promotion)
-        if game.promotion_pending: 
-            game.promote("queen")
-        
         command=input(f"{game.turn}> ").strip()
         if not command: 
             continue
