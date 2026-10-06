@@ -9,7 +9,6 @@ import argparse
 import random
 from game.chess_game import ChessGame
 from game.fen import square_name
-import agent.cpu
 
 def print_board(game):
     print()
@@ -64,7 +63,32 @@ def make_cpu_move(game):
     return
 
 def make_player_move(game):
-    pass
+    command=input(f"{game.turn}> ").strip()
+    while not command: 
+        command=input(f"{game.turn}> ").strip()
+    if command=="quit": 
+        return
+    if command=="fen": 
+        print(game.to_fen())
+    if command=="undo":
+        print("Undone." if game.undo() else "Nothing to undo.")
+    if command=="moves":
+        print(" ".join(square_name(a)+square_name(b) for a,b in game.legal_move_pairs()))
+    try:
+        if not game.push_uci(command):
+            print("Illegal move.")
+    except ValueError as exc:
+        print(exc)
+    return
+
+def play_next_move(white = "player", black="cpu"):
+    if white == "player":
+        make_player_move()
+        make_cpu_move()
+    else:
+        make_cpu_move()
+        make_player_move()
+    return
         
 def play_against_cpu(fen=None):
     """
@@ -73,33 +97,17 @@ def play_against_cpu(fen=None):
     print("frostyChess CLI — enter UCI moves such as e2e4 or e7e8q.")
     print("Commands: fen, undo, moves, quit")
     game=ChessGame.from_fen(fen) if fen else ChessGame()
-    color = input("Enter Color: [W]hite or [B]lack: ")
-    cpu_player = 1 if color == "W" else 0
-    player = 0
+    color = input("Enter Color. [W]hite or [B]lack ? ")
+    if color == "B":
+        white= "cpu"
+        black = "player"
+    else:
+        white= "player"
+        black="cpu"
     print("Start")
-    if cpu_player == 0:
-        make_cpu_move(game)
     while game.game_in_progress() and len(game.move_history)<400:
         print_board(game)
-        command=input(f"{game.turn}> ").strip()
-        if not command: 
-            continue
-        if command=="quit": 
-            return
-        if command=="fen": 
-            print(game.to_fen())
-            continue
-        if command=="undo":
-            print("Undone." if game.undo() else "Nothing to undo.")
-            continue
-        if command=="moves":
-            print(" ".join(square_name(a)+square_name(b) for a,b in game.legal_move_pairs()))
-            continue
-        try:
-            if not game.push_uci(command):
-                print("Illegal move.")
-        except ValueError as exc:
-            print(exc)
+        play_next_move(white )
     print_board(game)
     if game.is_checkmate():
         print(f"Checkmate — {game.opposite_color(game.turn)} wins.")
