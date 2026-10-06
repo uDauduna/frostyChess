@@ -9,6 +9,7 @@ import argparse
 import random
 from game.chess_game import ChessGame
 from game.fen import square_name
+import agent.cpu
 
 def print_board(game):
     print()
@@ -70,10 +71,14 @@ def random_self_play(games):
             counts["draw"]+=1
     print(counts)
 
+def play_against_cpu()
+
 if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--fen")
     parser.add_argument("--random-games",type=int,default=0)
     args=parser.parse_args()
-    if args.random_games: random_self_play(args.random_games)
-    else: interactive(args.fen)
+    if args.random_games: 
+        random_self_play(args.random_games)
+    else: 
+        interactive(args.fen)
