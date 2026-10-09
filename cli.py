@@ -55,14 +55,18 @@ def interactive(fen=None):
         print("Draw.")
 
 def make_cpu_move(game):
-    moves=game.legal_move_pairs()
-    if moves: 
-        start,end=random.choice(moves)
-        promotion="queen" if game.board.get_piece(start).piece_type=="pawn" and end[0] in (0,7) else None
-        game.make_move(start,end,promotion)
-        if game.promotion_pending: 
-            game.promote("queen")
-    return
+    """Play a random legal move for the side to move. Returns False if none exist."""
+    moves = game.legal_move_pairs()
+    if not moves:
+        return False
+    start, end = random.choice(moves)
+    is_pawn = game.board.get_piece(start).piece_type == "pawn"
+    promotion = "queen" if is_pawn and end[0] in (0, 7) else None
+    game.make_move(start, end, promotion)
+    if game.promotion_pending:          # defensive: finish any pending promotion
+        game.promote("queen")
+    print(f"CPU plays {game.san_history[-1]}")
+    return True
 
 def make_player_move(game, player_color):
     """Prompt until the player makes a legal move. Returns False if they quit."""
