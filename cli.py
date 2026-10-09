@@ -9,6 +9,7 @@ import argparse
 import random
 from game.chess_game import ChessGame
 from game.fen import square_name
+import time
 
 def print_board(game):
     print()
@@ -81,13 +82,15 @@ def make_player_move(game):
         print(exc)
     return
 
-def play_next_move(white = "player", black="cpu"):
+def play_next_move(game,white = "player", black="cpu"):
     if white == "player":
-        make_player_move()
-        make_cpu_move()
+        make_player_move(game)
+        make_cpu_move(game)
+        time.sleep(5)
     else:
-        make_cpu_move()
-        make_player_move()
+        make_cpu_move(game)
+        time.sleep(5)
+        make_player_move(game)
     return
         
 def play_against_cpu(fen=None):
@@ -107,7 +110,7 @@ def play_against_cpu(fen=None):
     print("Start")
     while game.game_in_progress() and len(game.move_history)<400:
         print_board(game)
-        play_next_move(white )
+        play_next_move(game, white, black)
     print_board(game)
     if game.is_checkmate():
         print(f"Checkmate — {game.opposite_color(game.turn)} wins.")
@@ -136,8 +139,11 @@ if __name__=="__main__":
     parser=argparse.ArgumentParser()
     parser.add_argument("--fen")
     parser.add_argument("--random-games",type=int,default=0)
+    parser.add_argument('-c', '--cpu', action='store_true') 
     args=parser.parse_args()
     if args.random_games: 
         random_self_play(args.random_games)
+    elif args.cpu:
+        play_against_cpu()
     else: 
         interactive(args.fen)
