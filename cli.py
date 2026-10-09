@@ -64,26 +64,45 @@ def make_cpu_move(game):
             game.promote("queen")
     return
 
-def make_player_move(game):
-    command=""
-    while not command: 
-        command=input(f"{game.turn}> ").strip()
-        if command=="quit": 
-            return
-        if command=="fen": 
+def make_player_move(game, player_color):
+    """Prompt until the player makes a legal move. Returns False if they quit."""
+    while True:
+        try:
+            command = input(f"{game.turn}> ").strip().lower()
+        except (EOFError, KeyboardInterrupt):
+            return False
+        if not command:
+            continue
+        if command == "quit":
+            return False
+        if command == "fen":
             print(game.to_fen())
-        if command=="undo":
-            print("Undone." if game.undo() else "Nothing to undo.")
-        if command=="moves":
-            print(" ".join(square_name(a)+square_name(b) for a,b in game.legal_move_pairs()))
+            continue
+        if command == "moves":
+            print(" ".join(square_name(a) + square_name(b)
+                           for a, b in game.legal_move_pairs()))
+            continue
+        if command == "undo":
+            if game.undo():
+                # Take back the CPU's reply too, so it's the player's turn again.
+                if game.turn != player_color:
+                    game.undo()
+                print("Undone.")
+                return True             # loop redraws the board
+            print("Nothing to undo.")
+            continue
         try:
             if not game.push_uci(command):
                 print("Illegal move.")
-                command = None
+                continue
         except ValueError as exc:
             print(exc)
-            command=None
-    return
+            continue
+        if game.promotion_pending:      # player typed e7e8 with no piece letter
+            game.promote("queen")
+            print("Promoted to queen.")
+        return True
+
 
 def play_next_move(game,white = "player", black="cpu"):
     if white == "player":
@@ -98,27 +117,36 @@ def play_next_move(game,white = "player", black="cpu"):
         
 def play_against_cpu(fen=None):
     """
-    Play a game against the cpu
+    Play a game against a random-move cpu
     """
     print("frostyChess CLI — enter UCI moves such as e2e4 or e7e8q.")
     print("Commands: fen, undo, moves, quit")
     game=ChessGame.from_fen(fen) if fen else ChessGame()
-    color = input("Enter Color. [W]hite or [B]lack ? ")
-    if color == "B":
-        white= "cpu"
-        black = "player"
-    else:
-        white= "player"
-        black="cpu"
-    print("Start")
+    choice = input("Enter Color. [W]hite or [B]lack ? ").strip().upper()
+    player_color = "black" if choice.startswith("B") else "white"
+    # Drive the loop from whose turn it actually is (handles FENs with black to move).
     while game.game_in_progress() and len(game.move_history)<400:
         print_board(game)
-        play_next_move(game, white, black)
+        if game.turn == player_color:
+            if not make_player_move(game, player_color):
+                print("Game abandoned.")
+                return
+        else:
+            make_cpu_move(game)
     print_board(game)
     if game.is_checkmate():
         print(f"Checkmate — {game.opposite_color(game.turn)} wins.")
+    elif game.is_stalemate():
+        print("Draw — stalemate.")
+    elif game.is_threefold_repetition():
+        print("Draw — threefold repetition.")
+    elif game.is_fifty_move_draw():
+        print("Draw — 50-move rule.")
+    elif game.is_insufficient_material():
+        print("Draw — insufficient material.")
     else:
-        print("Draw.")
+        print("Stopped — move limit reached.")
+    return
 
 def random_self_play(games):
     counts={"white":0,"black":0,"draw":0}
