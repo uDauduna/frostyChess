@@ -4,6 +4,7 @@ Examples:
     python cli.py
     python cli.py --fen "8/8/8/8/8/8/4K3/4k2R w - - 0 1"
     python cli.py --random-games 100
+    python cli.py -c
 """
 import argparse
 import random
@@ -64,22 +65,24 @@ def make_cpu_move(game):
     return
 
 def make_player_move(game):
-    command=input(f"{game.turn}> ").strip()
+    command=""
     while not command: 
         command=input(f"{game.turn}> ").strip()
-    if command=="quit": 
-        return
-    if command=="fen": 
-        print(game.to_fen())
-    if command=="undo":
-        print("Undone." if game.undo() else "Nothing to undo.")
-    if command=="moves":
-        print(" ".join(square_name(a)+square_name(b) for a,b in game.legal_move_pairs()))
-    try:
-        if not game.push_uci(command):
-            print("Illegal move.")
-    except ValueError as exc:
-        print(exc)
+        if command=="quit": 
+            return
+        if command=="fen": 
+            print(game.to_fen())
+        if command=="undo":
+            print("Undone." if game.undo() else "Nothing to undo.")
+        if command=="moves":
+            print(" ".join(square_name(a)+square_name(b) for a,b in game.legal_move_pairs()))
+        try:
+            if not game.push_uci(command):
+                print("Illegal move.")
+                command = None
+        except ValueError as exc:
+            print(exc)
+            command=None
     return
 
 def play_next_move(game,white = "player", black="cpu"):
